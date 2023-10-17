@@ -1,4 +1,3 @@
-import { Empty } from '../components/Empty'
 import { Login } from '../views/Login'
 import { Manage } from '../views/Manage'
 
@@ -13,7 +12,7 @@ export const MANAGE_URL = '/manage'
 const routes: RootRoutes[] = [
   {
     path: '/',
-    Ele: Empty
+    Ele: () => <></>
   },
   {
     path: MANAGE_URL,
@@ -22,7 +21,7 @@ const routes: RootRoutes[] = [
   {
     path: LOGIN_URL,
     Ele: Login
-  },
+  }
 ]
 
 export default routes
