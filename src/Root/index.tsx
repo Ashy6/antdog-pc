@@ -4,9 +4,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import routes, { LOGIN_URL } from '../route/root'
 import './global.scss'
 
-function RootApp () {
+function RootApp() {
   // 这里设置默认值 false 代表未登录的页面
-  const [isLoggedIn, _setIsLoggedIn] = useState(false)
+  const [isLoggedIn, _setIsLoggedIn] = useState(true)
 
   return (
     <BrowserRouter>
