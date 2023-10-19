@@ -1,0 +1,40 @@
+@use 'src/Root/variable.scss' as variable;
+
+.search-input-component {
+    border-bottom: 2.5px solid #eee;
+
+    .search-input {
+        margin: 0 250px;
+        padding-top: 15px;
+
+        .ant-input-wrapper {
+            min-width: 400px;
+            border-radius: 16px;
+            border: 2px solid variable.$search-color;
+            overflow: hidden;
+
+            .ant-input {
+                border-width: 0;
+
+                &:focus {
+                    box-shadow: none;
+                }
+            }
+
+            .ant-input-group-addon {
+
+                .ant-btn {
+                    border-width: 0;
+
+                    &-icon {
+                        color: variable.$search-color;
+
+                        .anticon-search {
+                            font-size: 22px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
