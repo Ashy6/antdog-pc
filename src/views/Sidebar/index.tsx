@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { MouseEventHandler, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from 'antd';
 import './style.scss'
 
@@ -12,7 +12,7 @@ interface Menu {
     children?: Menu[];
 }
 
-const menus: Menu[] = [
+const MENUS: Menu[] = [
     {
         key: 'cards',
         label: 'Cards',
@@ -50,17 +50,17 @@ const getClassName = (key: string, type: 'menu' | 'submenu') => {
 }
 
 export const Sidebar = (props: { menusChange: (selectedMenuKeys: string[]) => void }) => {
-    const [balancePoints, _setBalancePoints] = useState('987654321.98');
+    const [balancePoints] = useState('987654321.98');
 
-    const [_menus, _setMenus] = useState(menus);
+    const [menus] = useState(MENUS);
 
-    const [selectedMenuKeys, _setSelectedMenuKey] = useState([menus[0].key]);
+    const [selectedMenuKeys, setSelectedMenuKey] = useState([MENUS[0].key]);
 
     const onMenuClick = (item: Menu) => {
         if (item.key === 'ruling') {
-            _setSelectedMenuKey([item.key, item.children![0].key]);
+            setSelectedMenuKey([item.key, item.children![0].key]);
         }
-        _setSelectedMenuKey(item.parentId ? [item.key, item.parentId] : [item.key]);
+        setSelectedMenuKey(item.parentId ? [item.key, item.parentId] : [item.key]);
     }
 
     useEffect(() => {
