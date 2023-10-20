@@ -59,6 +59,7 @@ export const Sidebar = (props: { menusChange: (selectedMenuKeys: string[]) => vo
     const onMenuClick = (item: Menu) => {
         if (item.key === 'ruling') {
             setSelectedMenuKey([item.key, item.children![0].key]);
+            return;
         }
         setSelectedMenuKey(item.parentId ? [item.key, item.parentId] : [item.key]);
     }
