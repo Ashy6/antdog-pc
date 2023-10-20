@@ -32,10 +32,10 @@ const siderStyle: React.CSSProperties = {
 };
 
 export function Manage() {
-    const [params, setParams] = useState()
+    const [params] = useState()
 
-    const updateParams = (p: unknown) => {
-        setParams(p)
+    const updateParams = (selectedMenuKeys: string[]) => {
+        console.log(selectedMenuKeys);
     }
 
     useEffect(() => {
@@ -44,8 +44,8 @@ export function Manage() {
     return (
         <Space className='h-full w-full' direction="vertical" style={{ width: '100%', height: '100%', minWidth: 1200 }} size={[0, 48]}>
             <Layout>
-                <Sider theme='light' width="280px" style={siderStyle}>
-                    <Sidebar callback={updateParams}></Sidebar>
+                <Sider theme='light' style={siderStyle} width='256px'>
+                    <Sidebar menusChange={updateParams}></Sidebar>
                 </Sider>
                 <Layout>
                     <Header style={headerStyle}>
