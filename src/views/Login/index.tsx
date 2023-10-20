@@ -1,24 +1,48 @@
-import { Button, Checkbox, Form, Input } from 'antd'
+import { Button, Form, Input, message } from 'antd'
+import { login } from '../../api/login'
 import './style.scss'
 
 export const Login = (): JSX.Element => {
-    const onFinish = (values: unknown) => {
-        console.log('Success:', values)
+    const [messageApi] = message.useMessage();
+
+    const onFinish = (values: { name: string; password: string }) => {
+        const loginValue = {
+            mail: values.name,
+            password: values.password
+        }
+        login(loginValue).then(res => {
+            if (res.status === 200) {
+                const { code, data } = res.data
+                if (code === 0) {
+                    localStorage.setItem("AntdogToken", data.token);
+
+                    messageApi.open({
+                        type: 'success',
+                        content: data.msg,
+                    });
+                } else {
+                    messageApi.open({
+                        type: 'error',
+                        content: data.msg,
+                    });
+                }
+            }
+        })
     }
 
     const onFinishFailed = (errorInfo: unknown) => {
-        console.log('Failed:', errorInfo)
+        console.error('Failed:', errorInfo)
     }
 
     type FieldType = {
-        username?: string
+        name?: string
         password?: string
         remember?: string
     }
 
     return (
         <div className='login-container'>
-            <div className='bg-white text-[#333]'>
+            <div className='login-container-box'>
                 <label>Hello,Welcome to Antdog</label>
                 <Form
                     className='login-container-form'
@@ -32,9 +56,9 @@ export const Login = (): JSX.Element => {
                     autoComplete='off'
                 >
                     <Form.Item<FieldType>
-                        label='Username'
-                        name='username'
-                        rules={[{ required: true, message: 'Please input your username!' }]}
+                        label='Email'
+                        name='name'
+                        rules={[{ required: true, message: 'Please enter account' }]}
                     >
                         <Input />
                     </Form.Item>
@@ -42,22 +66,14 @@ export const Login = (): JSX.Element => {
                     <Form.Item<FieldType>
                         label='Password'
                         name='password'
-                        rules={[{ required: true, message: 'Please input your password!' }]}
+                        rules={[{ required: true, message: 'Please enter password' }]}
                     >
                         <Input.Password />
                     </Form.Item>
 
-                    <Form.Item<FieldType>
-                        name='remember'
-                        valuePropName='checked'
-                        wrapperCol={{ offset: 8, span: 16 }}
-                    >
-                        <Checkbox>Remember me</Checkbox>
-                    </Form.Item>
-
                     <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                         <Button type='primary' htmlType='submit'>
-                            Submit
+                            Login
                         </Button>
                     </Form.Item>
                 </Form>
