@@ -61,7 +61,7 @@ export const Sidebar = (props: { menusChange: (selectedMenuKeys: string[]) => vo
             setSelectedMenuKey([item.key, item.children![0].key]);
             return;
         }
-        setSelectedMenuKey(item.parentId ? [item.key, item.parentId] : [item.key]);
+        setSelectedMenuKey(item.parentId ? [item.parentId, item.key] : [item.key]);
     }
 
     useEffect(() => {
