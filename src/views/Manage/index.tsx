@@ -10,7 +10,7 @@ const { Header, Sider, Content } = Layout;
 const headerStyle: React.CSSProperties = {
     textAlign: 'center',
     color: '#666',
-    height: 80,
+    height: 100,
     paddingInline: 200,
     lineHeight: '64px',
     backgroundColor: '#FFF',
@@ -19,7 +19,6 @@ const headerStyle: React.CSSProperties = {
 const contentStyle: React.CSSProperties = {
     textAlign: 'center',
     minHeight: 120,
-    lineHeight: '120px',
     color: '#666',
     backgroundColor: '#fff',
 };
@@ -32,14 +31,11 @@ const siderStyle: React.CSSProperties = {
 };
 
 export function Manage() {
-    const [params] = useState()
+    const [params, setParams] = useState<string[]>([])
 
     const updateParams = (selectedMenuKeys: string[]) => {
-        console.log(selectedMenuKeys);
+        setParams(selectedMenuKeys);
     }
-
-    useEffect(() => {
-    }, [params])
 
     return (
         <Space className='h-full w-full' direction="vertical" style={{ width: '100%', height: '100%', minWidth: 1200 }} size={[0, 48]}>
@@ -47,12 +43,12 @@ export function Manage() {
                 <Sider theme='light' style={siderStyle} width='256px'>
                     <Sidebar menusChange={updateParams}></Sidebar>
                 </Sider>
-                <Layout>
+                <Layout style={{ width: 'calc(100% - 256px)'}}>
                     <Header style={headerStyle}>
                         <SearchInput></SearchInput>
                     </Header>
                     <Content style={contentStyle}>
-                        <Container />
+                        <Container select={params} />
                     </Content>
                 </Layout>
             </Layout>
