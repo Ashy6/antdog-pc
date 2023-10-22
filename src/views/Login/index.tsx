@@ -8,7 +8,6 @@ import './style.scss'
 type FieldType = {
     name?: string
     password?: string
-    remember?: string
 }
 
 export const Login = (): JSX.Element => {
@@ -50,7 +49,6 @@ export const Login = (): JSX.Element => {
                     labelCol={{ span: 8 }}
                     wrapperCol={{ span: 16 }}
                     style={{ maxWidth: 700 }}
-                    initialValues={{ remember: true }}
                     onFinish={(value) => !loading && onFinish(value)}
                     onFinishFailed={onFinishFailed}
                     autoComplete='off'

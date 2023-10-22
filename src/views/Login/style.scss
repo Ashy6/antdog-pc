@@ -22,7 +22,7 @@
     }
 
     &-form {
-        width: 600px;
+        width: 700px;
         text-align: center;
         padding: 20px;
         border-radius: 8px;
@@ -45,16 +45,21 @@
         // 复写 ant 原生样式
         .ant-form-item {
             width: 100%;
+            padding-right: 20%;
+
+            &:last-child {
+                padding-right: 24%;
+            }
 
             .ant-form-item-row {
 
                 width: 100%;
-
                 // .ant-form-item-label {
                 //     display: none;
                 // }
             }
 
+            // TODO: input 样式重写
             // .ant-input {
             //     border-width: 0;
             //     background-color: transparent !important;
