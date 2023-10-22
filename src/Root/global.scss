@@ -20,6 +20,10 @@
   background-color: #0bced6;
   font-weight: 700;
 
+  &.ant-btn-primary:not(:disabled):not(.ant-btn-disabled):hover {
+    background-color: #0bcfd6c7;
+  }
+
   &.disabled {
     color: #fff;
     background-color: #a0a0a0;

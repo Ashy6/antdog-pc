@@ -1,32 +1,36 @@
+import { useState } from 'react';
 import { Button, Form, Input, message } from 'antd'
+// import { useDispatch } from 'react-redux';
+// import { setLogin } from "../../store/reducers/loginState";
 import { login } from '../../api/login'
 import './style.scss'
 
+type FieldType = {
+    name?: string
+    password?: string
+    remember?: string
+}
+
 export const Login = (): JSX.Element => {
-    const [messageApi] = message.useMessage();
+    const [loading, setLoading] = useState(false);
+    // const dispatch = useDispatch();
+    // const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const onFinish = (values: { name: string; password: string }) => {
-        const loginValue = {
+        setLoading(true)
+        login({
             mail: values.name,
             password: values.password
-        }
-        login(loginValue).then(res => {
+        }).then(res => {
             if (res.status === 200) {
-                const { code, data } = res.data
-                if (code === 0) {
-                    localStorage.setItem("AntdogToken", data.token);
-
-                    messageApi.open({
-                        type: 'success',
-                        content: data.msg,
-                    });
-                } else {
-                    messageApi.open({
-                        type: 'error',
-                        content: data.msg,
-                    });
-                }
+                const { code, data, msg } = res.data
+                message[code === 0 ? 'success' : 'error']({
+                    content: msg,
+                });
+                localStorage.setItem("AntdogToken", data?.token);
             }
+        }).finally(() => {
+            setLoading(false)
         })
     }
 
@@ -34,27 +38,26 @@ export const Login = (): JSX.Element => {
         console.error('Failed:', errorInfo)
     }
 
-    type FieldType = {
-        name?: string
-        password?: string
-        remember?: string
-    }
-
     return (
         <div className='login-container'>
             <div className='login-container-box'>
-                <label>Hello,Welcome to Antdog</label>
+                <div className='title'>
+                    Hello,Welcome to Antdog
+                </div>
                 <Form
                     className='login-container-form'
                     name='basic'
                     labelCol={{ span: 8 }}
                     wrapperCol={{ span: 16 }}
-                    style={{ maxWidth: 600 }}
+                    style={{ maxWidth: 700 }}
                     initialValues={{ remember: true }}
-                    onFinish={onFinish}
+                    onFinish={(value) => !loading && onFinish(value)}
                     onFinishFailed={onFinishFailed}
                     autoComplete='off'
                 >
+                    <div className='account'>
+                        Login by account
+                    </div>
                     <Form.Item<FieldType>
                         label='Email'
                         name='name'
@@ -72,8 +75,8 @@ export const Login = (): JSX.Element => {
                     </Form.Item>
 
                     <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                        <Button type='primary' htmlType='submit'>
-                            Login
+                        <Button className='antdog-btn' type='primary' htmlType='submit'>
+                            {loading ? 'Logging...' : 'Login'}
                         </Button>
                     </Form.Item>
                 </Form>
