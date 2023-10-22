@@ -7,13 +7,9 @@ interface RootRoutes {
 }
 
 export const LOGIN_URL = '/login'
-export const MANAGE_URL = '/manage'
+export const MANAGE_URL = '/'
 
 const routes: RootRoutes[] = [
-  {
-    path: '/',
-    Ele: () => <></>
-  },
   {
     path: MANAGE_URL,
     Ele: Manage
