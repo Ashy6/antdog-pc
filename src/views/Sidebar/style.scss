@@ -64,6 +64,15 @@
             color: #595959;
             font-weight: bold;
             font-size: 18px;
+
+            &,
+            &:hover {
+                background-color: transparent !important;
+            }
+
+            &:hover {
+                color: #20f6ff;
+            }
         }
     }
 }

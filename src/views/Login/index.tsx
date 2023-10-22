@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button, Form, Input, message } from 'antd'
+import { SyncOutlined } from '@ant-design/icons'
 // import { useDispatch } from 'react-redux';
 // import { setLogin } from "../../store/reducers/loginState";
 import { login } from '../../api/login'
+import { MANAGE_URL } from '../../route/root'
 import './style.scss'
 
 type FieldType = {
@@ -11,7 +14,8 @@ type FieldType = {
 }
 
 export const Login = (): JSX.Element => {
-    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(false)
     // const dispatch = useDispatch();
     // const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -24,9 +28,10 @@ export const Login = (): JSX.Element => {
             if (res.status === 200) {
                 const { code, data, msg } = res.data
                 message[code === 0 ? 'success' : 'error']({
-                    content: msg,
-                });
-                localStorage.setItem("AntdogToken", data?.token);
+                    content: msg
+                })
+                code === 0 && navigate(MANAGE_URL)
+                localStorage.setItem('AntdogToken', data?.token)
             }
         }).finally(() => {
             setLoading(false)
@@ -40,22 +45,18 @@ export const Login = (): JSX.Element => {
     return (
         <div className='login-container'>
             <div className='login-container-box'>
-                <div className='title'>
-                    Hello,Welcome to Antdog
-                </div>
+                <div className='title'>Hello,Welcome to Antdog</div>
                 <Form
                     className='login-container-form'
                     name='basic'
                     labelCol={{ span: 8 }}
                     wrapperCol={{ span: 16 }}
                     style={{ maxWidth: 700 }}
-                    onFinish={(value) => !loading && onFinish(value)}
+                    onFinish={value => !loading && onFinish(value)}
                     onFinishFailed={onFinishFailed}
                     autoComplete='off'
                 >
-                    <div className='account'>
-                        Login by account
-                    </div>
+                    <div className='account'>Login by account</div>
                     <Form.Item<FieldType>
                         label='Email'
                         name='name'
@@ -74,7 +75,13 @@ export const Login = (): JSX.Element => {
 
                     <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                         <Button className='antdog-btn' type='primary' htmlType='submit'>
-                            {loading ? 'Logging...' : 'Login'}
+                            {loading ? (
+                                <>
+                                    Logging <SyncOutlined spin />
+                                </>
+                            ) : (
+                                <>Login</>
+                            )}
                         </Button>
                     </Form.Item>
                 </Form>

@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from "react"
 import { Button } from 'antd';
+import { LOGIN_URL } from "../../route/root";
+import { useNavigate } from "react-router-dom";
 import './style.scss'
 
 type MenuType = 'menu' | 'submenu';
@@ -50,8 +52,8 @@ const getClassName = (key: string, type: 'menu' | 'submenu') => {
 }
 
 export const Sidebar = (props: { menusChange: (selectedMenuKeys: string[]) => void }) => {
+    const navigate = useNavigate();
     const [balancePoints] = useState('987654321.98');
-
     const [menus] = useState(MENUS);
 
     const [selectedMenuKeys, setSelectedMenuKey] = useState([MENUS[0].key]);
@@ -67,6 +69,12 @@ export const Sidebar = (props: { menusChange: (selectedMenuKeys: string[]) => vo
     useEffect(() => {
         props.menusChange(selectedMenuKeys);
     }, [selectedMenuKeys]);
+
+    const onLogouClick = () => {
+        // TODO: 1.二次弹框确认   2.清除全局状态管理中的登录状态管理
+        localStorage.setItem("AntdogToken", '');
+        navigate(LOGIN_URL)
+    }
 
     return (
         <div className='sidebar'>
@@ -96,7 +104,7 @@ export const Sidebar = (props: { menusChange: (selectedMenuKeys: string[]) => vo
                 })
             }
             <div className='logout-box'>
-                <Button type="link">Logout</Button>
+                <Button type="link" className="antdog-btn" onClick={onLogouClick}>Logout</Button>
             </div>
         </div>
 
