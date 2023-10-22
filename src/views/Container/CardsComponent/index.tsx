@@ -108,7 +108,7 @@ export const CardsComponent = props => {
             {/* In trade */}
             <div className='card-item-btn'>
                 <Button className='antdog-btn' type="primary">Negotiate</Button>
-                <Button className='antdog-btn disabled' type="primary" disabled>
+                <Button className='antdog-btn' type="primary">
                     Release
                 </Button>
             </div>
