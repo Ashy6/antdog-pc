@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button, Image } from 'antd';
 import icon from '../../../assets/png'
 import './style.scss'
@@ -70,11 +71,11 @@ export const CardsComponent = props => {
                     }}
                 >
                     {
-                        img.slice(0, 3).map(img => <Image width={100} height={120} src={img} />)
+                        img.slice(0, 3).map((img, i) => <Image key={i} width={100} height={120} src={img} />)
                     }
                     {/* 不满足三个展示空占位 */}
                     {
-                        img.length < 3 && Array.from({ length: 3 - img.length }, () => <div className='ant-image'></div>)
+                        img.length < 3 && Array.from({ length: 3 - img.length }, (_, i) => <div className='ant-image' key={`empty-${i}`}></div>)
                     }
                 </Image.PreviewGroup>
             </div>
