@@ -8,17 +8,66 @@
 
     &-box {
         border-radius: 16px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        transition: box-shadow 0.3s ease-in-out;
-      
-        &:hover {
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+        .title {
+            width: 100%;
+            text-align: center;
+            border-bottom: 3px solid #e0e0e0;
+            font-size: 24px;
+            padding: 25px 0;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #0cd0d4;
         }
     }
 
     &-form {
+        width: 700px;
         text-align: center;
         padding: 20px;
         border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease-in-out;
+
+        &:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .account {
+            width: max-content;
+            height: 40px;
+            margin: 0 auto 40px;
+            font-weight: 600;
+            font-size: 20px;
+            border-bottom: 2px solid #dfdfdf;
+        }
+
+        // 复写 ant 原生样式
+        .ant-form-item {
+            width: 100%;
+            padding-right: 20%;
+
+            &:last-child {
+                padding-right: 24%;
+            }
+
+            .ant-form-item-row {
+
+                width: 100%;
+                // .ant-form-item-label {
+                //     display: none;
+                // }
+            }
+
+            // TODO: input 样式重写
+            // .ant-input {
+            //     border-width: 0;
+            //     background-color: transparent !important;
+
+            //     &:focus {
+            //         box-shadow: none;
+            //     }
+            // }
+        }
     }
 }

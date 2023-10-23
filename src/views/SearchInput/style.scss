@@ -1,7 +1,7 @@
 @use 'src/Root/variable.scss' as variable;
 
 .search-input-component {
-    border-bottom: 2.5px solid #eee;
+    border-bottom: 3px solid #eee;
 
     .search-input {
         margin: 0 250px;
@@ -9,8 +9,9 @@
 
         .ant-input-wrapper {
             min-width: 400px;
+            max-width: 800px;
             border-radius: 16px;
-            border: 2px solid variable.$search-color;
+            border: 4px solid variable.$search-color;
             overflow: hidden;
 
             .ant-input {

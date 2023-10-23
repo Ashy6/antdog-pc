@@ -1,60 +1,54 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button, Form, Input, message } from 'antd'
+import { SyncOutlined } from '@ant-design/icons'
 import { login } from '../../api/login'
+import { MANAGE_URL } from '../../route/root'
 import './style.scss'
 
+type FieldType = {
+    name?: string
+    password?: string
+}
+
 export const Login = (): JSX.Element => {
-    const [messageApi] = message.useMessage();
+    const navigate = useNavigate()
+    const [loading, setLoading] = useState(false)
 
     const onFinish = (values: { name: string; password: string }) => {
-        const loginValue = {
+        setLoading(true)
+        login({
             mail: values.name,
             password: values.password
-        }
-        login(loginValue).then(res => {
+        }).then(res => {
             if (res.status === 200) {
-                const { code, data } = res.data
-                if (code === 0) {
-                    localStorage.setItem("AntdogToken", data.token);
-
-                    messageApi.open({
-                        type: 'success',
-                        content: data.msg,
-                    });
-                } else {
-                    messageApi.open({
-                        type: 'error',
-                        content: data.msg,
-                    });
-                }
+                const { code, data, msg } = res.data
+                message[code === 0 ? 'success' : 'error']({
+                    content: msg
+                })
+                localStorage.setItem('AntdogToken', data?.token)
             }
-        })
-    }
-
-    const onFinishFailed = (errorInfo: unknown) => {
-        console.error('Failed:', errorInfo)
-    }
-
-    type FieldType = {
-        name?: string
-        password?: string
-        remember?: string
+            return res.data.code === 0
+        }).then(code => code && navigate(MANAGE_URL))
+            .finally(() => {
+                setLoading(false)
+            })
     }
 
     return (
         <div className='login-container'>
             <div className='login-container-box'>
-                <label>Hello,Welcome to Antdog</label>
+                <div className='title'>Hello,Welcome to Antdog</div>
                 <Form
                     className='login-container-form'
                     name='basic'
                     labelCol={{ span: 8 }}
                     wrapperCol={{ span: 16 }}
-                    style={{ maxWidth: 600 }}
-                    initialValues={{ remember: true }}
-                    onFinish={onFinish}
-                    onFinishFailed={onFinishFailed}
+                    style={{ maxWidth: 700 }}
+                    onFinish={value => !loading && onFinish(value)}
                     autoComplete='off'
                 >
+                    <div className='account'>Login by account</div>
                     <Form.Item<FieldType>
                         label='Email'
                         name='name'
@@ -72,8 +66,14 @@ export const Login = (): JSX.Element => {
                     </Form.Item>
 
                     <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                        <Button type='primary' htmlType='submit'>
-                            Login
+                        <Button className='antdog-btn' type='primary' htmlType='submit'>
+                            {loading ? (
+                                <>
+                                    Logging <SyncOutlined spin />
+                                </>
+                            ) : (
+                                <>Login</>
+                            )}
                         </Button>
                     </Form.Item>
                 </Form>

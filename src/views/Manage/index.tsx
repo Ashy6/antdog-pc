@@ -1,45 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout, Space } from 'antd';
+import { getOrderPage } from '../../api/manage';
+
 import { Sidebar } from '../Sidebar';
 import { Container } from '../Container';
 import { SearchInput } from '../SearchInput';
+
+import { contentStyle, headerStyle, siderStyle } from './data';
+import { ActiveSidebar } from './types';
+
 import './style.scss'
 
 const { Header, Sider, Content } = Layout;
 
-const headerStyle: React.CSSProperties = {
-    textAlign: 'center',
-    color: '#666',
-    height: 80,
-    paddingInline: 200,
-    lineHeight: '64px',
-    backgroundColor: '#FFF',
-};
-
-const contentStyle: React.CSSProperties = {
-    textAlign: 'center',
-    minHeight: 120,
-    lineHeight: '120px',
-    color: '#666',
-    backgroundColor: '#fff',
-};
-
-const siderStyle: React.CSSProperties = {
-    textAlign: 'center',
-    lineHeight: '120px',
-    color: '#666',
-    backgroundColor: '#fff',
-};
 
 export function Manage() {
-    const [params] = useState()
-
-    const updateParams = (selectedMenuKeys: string[]) => {
-        console.log(selectedMenuKeys);
-    }
+    const [params, setParams] = useState<ActiveSidebar>({} as ActiveSidebar)
 
     useEffect(() => {
-    }, [params])
+        const option = {
+            orderNO: '',
+            status: '',
+            subStatus: '',
+            page: 1,
+            pageSize: 8
+        }
+
+        getOrderPage(option).then(res => {
+            console.log('res', res);
+        })
+    }, []);
+
+    const updateParams = (selectedMenuKeys: ActiveSidebar) => {
+        setParams(selectedMenuKeys);
+    }
 
     return (
         <Space className='h-full w-full' direction="vertical" style={{ width: '100%', height: '100%', minWidth: 1200 }} size={[0, 48]}>
@@ -47,12 +41,12 @@ export function Manage() {
                 <Sider theme='light' style={siderStyle} width='256px'>
                     <Sidebar menusChange={updateParams}></Sidebar>
                 </Sider>
-                <Layout>
+                <Layout style={{ width: 'calc(100% - 256px)' }}>
                     <Header style={headerStyle}>
                         <SearchInput></SearchInput>
                     </Header>
                     <Content style={contentStyle}>
-                        <Container />
+                        <Container select={params} />
                     </Content>
                 </Layout>
             </Layout>

@@ -6,7 +6,6 @@ import './global.scss'
 
 function RootApp() {
   // 这里设置默认值 false 代表未登录的页面
-  const [isLoggedIn, _setIsLoggedIn] = useState(true)
 
   return (
     <BrowserRouter>
@@ -15,13 +14,7 @@ function RootApp() {
           <Route
             key={index}
             path={path}
-            element={
-              isLoggedIn || path === LOGIN_URL ? (
-                <Ele></Ele>
-              ) : (
-                <Navigate to={LOGIN_URL} />
-              )
-            }
+            element={<Ele />}
           ></Route>
         ))}
       </Routes>
