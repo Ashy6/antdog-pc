@@ -1,4 +1,4 @@
-import { AxiosResponse, VITE_CONFIG, request } from "./utils";
+import { AxiosResponse, VITE_CONFIG, instance } from "./utils";
 
 export interface LoginParams {
     mail: string
@@ -6,7 +6,7 @@ export interface LoginParams {
 }
 
 export function login(options: LoginParams): Promise<AxiosResponse> {
-  return request({
+  return instance({
     url: `${VITE_CONFIG}/login`,
     method: 'post',
     data: options

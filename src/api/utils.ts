@@ -1,24 +1,59 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios'
+import { Codes } from './code'
+import { LOGIN_URL } from '../route/root'
 
 // export const API_URL = 'https://www.bee456.com'
 export const API_URL = 'https://2167d872c4.zicp.fun'
 // export const API_URL = '154.212.145.170:9001'
 
-export const VITE_CONFIG = '/gcard/web'
+export const VITE_CONFIG = '/api/gcard/web'
 
-export const request = axios.create({
-  baseURL: API_URL,
+export const instance = axios.create({
+  // baseURL: API_URL,
   timeout: 40000
 })
 
-export const instance = axios.create({
-  baseURL: API_URL,
-  timeout: 40000,
-  headers: {
-    token: localStorage.getItem('AntdogToken') // 设置默认的Content-Type为JSON
+// 请求拦截器
+instance.interceptors.request.use(async (config: any & { cType?: boolean }) => {
+  // 判断token是否过期
+  const token = localStorage.getItem('AntdogToken')
+  if (token) {
+    config.headers.token = token
   }
+  return config
 })
+
+// 添加响应拦截器
+instance.interceptors.response.use(
+  response => {
+    // 在这里对返回的响应进行判断和处理
+    if (response.status === 200) {
+      // 响应状态码为200时，进行一些操作
+      if (response.data.code === Codes.ok) {
+        // 响应成功后的操作
+        return response
+      }
+      if (
+        [Codes.notLogin, Codes.unauthorized, Codes.tokenError].includes(
+          response.data.code
+        )
+      ) {
+        window.location.href = LOGIN_URL
+        return Promise.reject()
+      }
+    } else {
+      // 响应状态码不为200时，进行其他操作
+      console.error('请求失败')
+    }
+    return response
+  },
+  error => {
+    // 对请求错误进行处理
+    console.error('请求出错', error)
+    return Promise.reject(error)
+  }
+)
 
 export interface RequestDate {
   code?: number

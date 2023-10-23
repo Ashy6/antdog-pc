@@ -2,8 +2,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Form, Input, message } from 'antd'
 import { SyncOutlined } from '@ant-design/icons'
-// import { useDispatch } from 'react-redux';
-// import { setLogin } from "../../store/reducers/loginState";
 import { login } from '../../api/login'
 import { MANAGE_URL } from '../../route/root'
 import './style.scss'
@@ -16,8 +14,6 @@ type FieldType = {
 export const Login = (): JSX.Element => {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
-    // const dispatch = useDispatch();
-    // const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const onFinish = (values: { name: string; password: string }) => {
         setLoading(true)
@@ -30,16 +26,13 @@ export const Login = (): JSX.Element => {
                 message[code === 0 ? 'success' : 'error']({
                     content: msg
                 })
-                code === 0 && navigate(MANAGE_URL)
                 localStorage.setItem('AntdogToken', data?.token)
             }
-        }).finally(() => {
-            setLoading(false)
-        })
-    }
-
-    const onFinishFailed = (errorInfo: unknown) => {
-        console.error('Failed:', errorInfo)
+            return res.data.code === 0
+        }).then(code => code && navigate(MANAGE_URL))
+            .finally(() => {
+                setLoading(false)
+            })
     }
 
     return (
@@ -53,7 +46,6 @@ export const Login = (): JSX.Element => {
                     wrapperCol={{ span: 16 }}
                     style={{ maxWidth: 700 }}
                     onFinish={value => !loading && onFinish(value)}
-                    onFinishFailed={onFinishFailed}
                     autoComplete='off'
                 >
                     <div className='account'>Login by account</div>

@@ -6,8 +6,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/gcard/web': {
-        target: 'https://www.bee456.com/gcard/web/',
+      '/api': {
+        target: 'https://2167d872c4.zicp.fun',
         changeOrigin: true,
         ws: true,
         rewrite: path => {

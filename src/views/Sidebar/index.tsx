@@ -36,6 +36,7 @@ export const Sidebar = (props: {
             subMenuKey,
             isRuling: activeMenu === SidebarMenuType.Ruling
         })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeMenu, activeSubMenu])
 
     const onLogouClick = () => {
