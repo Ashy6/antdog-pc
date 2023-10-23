@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios'
 
-export const API_URL = 'https://www.bee456.com'
-// export const API_URL = 'https://2167d872c4.zicp.fun'
+// export const API_URL = 'https://www.bee456.com'
+export const API_URL = 'https://2167d872c4.zicp.fun'
 // export const API_URL = '154.212.145.170:9001'
 
 export const VITE_CONFIG = '/gcard/web'
@@ -10,6 +10,14 @@ export const VITE_CONFIG = '/gcard/web'
 export const request = axios.create({
   baseURL: API_URL,
   timeout: 40000
+})
+
+export const instance = axios.create({
+  baseURL: API_URL,
+  timeout: 40000,
+  headers: {
+    token: localStorage.getItem('AntdogToken') // 设置默认的Content-Type为JSON
+  }
 })
 
 export interface RequestDate {
