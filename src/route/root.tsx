@@ -12,11 +12,11 @@ export const MANAGE_URL = '/'
 const routes: RootRoutes[] = [
   {
     path: MANAGE_URL,
-    Ele: Manage
+    Ele: () => <Manage></Manage>
   },
   {
     path: LOGIN_URL,
-    Ele: Login
+    Ele: () => <Login></Login>
   }
 ]
 
