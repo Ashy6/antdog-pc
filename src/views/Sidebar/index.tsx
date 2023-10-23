@@ -1,78 +1,46 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useEffect, useState } from "react"
-import { Button } from 'antd';
-import { LOGIN_URL } from "../../route/root";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Button } from 'antd'
+
+import { LOGIN_URL } from '../../route/root'
+import { MENUS } from '../Manage/data'
+import {
+    ActiveSidebar,
+    SidebarMenuType,
+    SidebarSubMenuType
+} from '../Manage/types'
+
 import './style.scss'
 
-type MenuType = 'menu' | 'submenu';
-interface Menu {
-    key: string;
-    label: string;
-    type: MenuType;
-    parentId?: string;
-    children?: Menu[];
-}
+export const Sidebar = (props: {
+    menusChange: (activeSidebar: ActiveSidebar) => void
+}) => {
+    const navigate = useNavigate()
+    const [balancePoints] = useState('987654321.98')
 
-const MENUS: Menu[] = [
-    {
-        key: 'cards',
-        label: 'Cards',
-        type: 'menu',
-        children: [
-            { key: 'cards-in-trade', parentId: 'cards', label: 'In trade', type: 'submenu' },
-            { key: 'cards-in-dispute', parentId: 'cards', label: 'In dispute', type: 'submenu' },
-            { key: 'cards-completed', parentId: 'cards', label: 'Completed', type: 'submenu' },
-        ]
-    },
-    {
-        key: 'points',
-        label: 'Points',
-        type: 'menu',
-        children: [
-            { key: 'points-in-trade', parentId: 'points', label: 'In trade', type: 'submenu' },
-            { key: 'points-completed', parentId: 'points', label: 'Completed', type: 'submenu' },
-            { key: 'points-in-dispute', parentId: 'points', label: 'In dispute', type: 'submenu' },
-            { key: 'points-cancelled', parentId: 'points', label: 'Cancelled', type: 'submenu' },
-        ]
-    },
-    {
-        key: 'ruling',
-        label: 'Ruling',
-        type: 'menu',
-        children: [
-            { key: 'ruling-cards', parentId: 'ruling', label: 'Cards', type: 'submenu' },
-            { key: 'ruling-points', parentId: 'ruling', label: 'Points', type: 'submenu' },
-        ]
-    }
-]
-const getClassName = (key: string, type: 'menu' | 'submenu') => {
-    const className = `${type} ${key}`
-    return className;
-}
-
-export const Sidebar = (props: { menusChange: (selectedMenuKeys: string[]) => void }) => {
-    const navigate = useNavigate();
-    const [balancePoints] = useState('987654321.98');
-    const [menus] = useState(MENUS);
-
-    const [selectedMenuKeys, setSelectedMenuKey] = useState([MENUS[0].key]);
-
-    const onMenuClick = (item: Menu) => {
-        if (item.key === 'ruling') {
-            setSelectedMenuKey([item.key, item.children![0].key]);
-            return;
-        }
-        setSelectedMenuKey(item.parentId ? [item.parentId, item.key] : [item.key]);
-    }
+    const [activeMenu, setActiveMenu] = useState(MENUS[0].key)
+    const [activeSubMenu, setActiveSubMenu] = useState<
+        SidebarMenuType | SidebarSubMenuType
+    >(SidebarSubMenuType.none)
 
     useEffect(() => {
-        props.menusChange(selectedMenuKeys);
-    }, [selectedMenuKeys]);
+        console.log('activeMenu, activeSubMenu', activeMenu, activeSubMenu)
+        const menuKey =
+            activeMenu === SidebarMenuType.Ruling
+                ? (activeSubMenu as SidebarMenuType)
+                : activeMenu
+        const subMenuKey = activeSubMenu
+        props.menusChange({
+            menuKey,
+            subMenuKey,
+            isRuling: activeMenu === SidebarMenuType.Ruling
+        })
+    }, [activeMenu, activeSubMenu])
 
     const onLogouClick = () => {
         // TODO: 1.二次弹框确认   2.清除全局状态管理中的登录状态管理
-        localStorage.setItem("AntdogToken", '');
+        localStorage.setItem('AntdogToken', '')
         navigate(LOGIN_URL)
     }
 
@@ -85,28 +53,46 @@ export const Sidebar = (props: { menusChange: (selectedMenuKeys: string[]) => vo
                     <div className='balance'>{balancePoints} Points</div>
                 </div>
             </div>
-            {
-                menus.map(menu => {
-                    let menuClassName = getClassName(menu.key, menu.type);
-                    if (menu.children && menu.children.length > 0) {
-                        return <ul key={menu.key}>
-                            <div className={menuClassName += (selectedMenuKeys.includes(menu.key) ? ' active' : '')} onClick={() => onMenuClick(menu)}>{menu.label}</div>
-                            {
-                                menu.children?.map(submenu => {
-                                    let submenuClassName = getClassName(submenu.key, submenu.type);
-                                    return <li key={submenu.key} className={submenuClassName += (selectedMenuKeys.includes(submenu.key) ? ' active' : '')} onClick={() => onMenuClick(submenu)}>{submenu.label}</li>
-                                })
+            {MENUS.map(menu => (
+                <ul key={menu.key}>
+                    <div
+                        className={`${menu.type} ${menu.key} ${activeMenu === menu.key && ' active'
+                            }`}
+                        onClick={() => {
+                            setActiveMenu(menu.key)
+                            if (menu.key === SidebarMenuType.Ruling) {
+                                // Ruling 默认选第一个子
+                                setActiveSubMenu(menu.children[0].key)
+                            } else {
+                                // 选父默认为空
+                                setActiveSubMenu(SidebarSubMenuType.none)
                             }
-                        </ul>
-                    } else {
-                        return <ul className={menuClassName}>{menu.label}</ul>
-                    }
-                })
-            }
+                        }}
+                    >
+                        {menu.label}
+                    </div>
+                    {menu.children.map(submenu => (
+                        <li
+                            key={submenu.key}
+                            className={`${submenu.type} ${submenu.key} ${activeMenu === menu.key &&
+                                activeSubMenu === submenu.key &&
+                                ' active'
+                                }`}
+                            onClick={() => {
+                                setActiveMenu(menu.key)
+                                setActiveSubMenu(submenu.key)
+                            }}
+                        >
+                            {submenu.label}
+                        </li>
+                    ))}
+                </ul>
+            ))}
             <div className='logout-box'>
-                <Button type="link" className="antdog-btn" onClick={onLogouClick}>Logout</Button>
+                <Button type='link' className='antdog-btn' onClick={onLogouClick}>
+                    Logout
+                </Button>
             </div>
         </div>
-
-    );
+    )
 }

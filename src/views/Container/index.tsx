@@ -1,21 +1,22 @@
+import { useEffect, useState } from 'react';
 import { Col, Row } from 'antd';
 import { CardsComponent } from './CardsComponent';
 import { PointsComponent } from './PointsComponent';
+import { ActiveSidebar } from '../Manage/types';
 import './style.scss'
-import { useEffect, useState } from 'react';
 
 const component: { [key: string]: (props) => JSX.Element } = {
     cards: (props) => <CardsComponent value={props}></CardsComponent>,
     points: (props) => <PointsComponent value={props}></PointsComponent>
 }
 
-export const Container = ({ select }: { select: string[] }) => {
-
+export const Container = (props: { select: ActiveSidebar }) => {
+    const { select } = props
     const [showType, setShowType] = useState('');
 
     useEffect(() => {
-        console.log(select);
-        setShowType(select[0])
+        const { menuKey, subMenuKey, isRuling } = select
+        setShowType(menuKey)
     }, [select]);
 
     return (

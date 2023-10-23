@@ -1,39 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout, Space } from 'antd';
+import { getOrderPage } from '../../api/manage';
+
 import { Sidebar } from '../Sidebar';
 import { Container } from '../Container';
 import { SearchInput } from '../SearchInput';
+
+import { contentStyle, headerStyle, siderStyle } from './data';
+import { ActiveSidebar } from './types';
+
 import './style.scss'
 
 const { Header, Sider, Content } = Layout;
 
-const headerStyle: React.CSSProperties = {
-    textAlign: 'center',
-    color: '#666',
-    height: 100,
-    paddingInline: 200,
-    lineHeight: '64px',
-    backgroundColor: '#FFF',
-};
-
-const contentStyle: React.CSSProperties = {
-    textAlign: 'center',
-    minHeight: 120,
-    color: '#666',
-    backgroundColor: '#fff',
-};
-
-const siderStyle: React.CSSProperties = {
-    textAlign: 'center',
-    lineHeight: '120px',
-    color: '#666',
-    backgroundColor: '#fff',
-};
 
 export function Manage() {
-    const [params, setParams] = useState<string[]>([])
+    const [params, setParams] = useState<ActiveSidebar>({} as ActiveSidebar)
 
-    const updateParams = (selectedMenuKeys: string[]) => {
+    useEffect(() => {
+        const option = {
+            orderNO: '',
+            status: '',
+            subStatus: '',
+            page: 1,
+            pageSize: 8
+        }
+
+        getOrderPage(option).then(res => {
+            console.log('res', res);
+        })
+    }, []);
+
+    const updateParams = (selectedMenuKeys: ActiveSidebar) => {
         setParams(selectedMenuKeys);
     }
 
@@ -43,7 +41,7 @@ export function Manage() {
                 <Sider theme='light' style={siderStyle} width='256px'>
                     <Sidebar menusChange={updateParams}></Sidebar>
                 </Sider>
-                <Layout style={{ width: 'calc(100% - 256px)'}}>
+                <Layout style={{ width: 'calc(100% - 256px)' }}>
                     <Header style={headerStyle}>
                         <SearchInput></SearchInput>
                     </Header>
