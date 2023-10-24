@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
@@ -36,7 +37,6 @@ export const Sidebar = (props: {
             subMenuKey,
             isRuling: activeMenu === SidebarMenuType.Ruling
         })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeMenu, activeSubMenu])
 
     const onLogouClick = () => {
@@ -81,7 +81,13 @@ export const Sidebar = (props: {
                                 }`}
                             onClick={() => {
                                 setActiveMenu(menu.key)
-                                setActiveSubMenu(submenu.key)
+                                if (menu.key === SidebarMenuType.Ruling) {
+                                    // Ruling 只有选中逻辑
+                                    setActiveSubMenu(submenu.key)
+                                } else {
+                                    // 子菜单有 取消选中逻辑
+                                    setActiveSubMenu(submenu.key === activeSubMenu ? SidebarSubMenuType.none : submenu.key)
+                                }
                             }}
                         >
                             {submenu.label}
