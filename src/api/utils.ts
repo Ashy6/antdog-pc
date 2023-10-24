@@ -15,7 +15,7 @@ export const instance = axios.create({
 })
 
 // 请求拦截器
-instance.interceptors.request.use(async (config: any & { cType?: boolean }) => {
+instance.interceptors.request.use(async (config: any) => {
   // 判断token是否过期
   const token = localStorage.getItem('AntdogToken')
   if (token) {
@@ -32,13 +32,14 @@ instance.interceptors.response.use(
       // 响应状态码为200时，进行一些操作
       if (response.data.code === Codes.ok) {
         // 响应成功后的操作
-        return response
+        return response.data
       }
       if (
         [Codes.notLogin, Codes.unauthorized, Codes.tokenError].includes(
           response.data.code
         )
       ) {
+        // 这个项目采用接口请求返回状态码来判断路由
         window.location.href = LOGIN_URL
         return Promise.reject()
       }
@@ -46,7 +47,7 @@ instance.interceptors.response.use(
       // 响应状态码不为200时，进行其他操作
       console.error('请求失败')
     }
-    return response
+    return response.data
   },
   error => {
     // 对请求错误进行处理

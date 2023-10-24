@@ -28,6 +28,7 @@
         cursor: pointer;
         line-height: 52px;
         font-weight: bold;
+        user-select: none;
 
         &.active {
             background-color: #02f7ff;

@@ -1,12 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { useState } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import routes, { LOGIN_URL } from '../route/root'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import routes from '../route/root'
 import './global.scss'
 
 function RootApp() {
-  // 这里设置默认值 false 代表未登录的页面
-
   return (
     <BrowserRouter>
       <Routes>

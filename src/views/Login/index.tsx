@@ -21,14 +21,14 @@ export const Login = (): JSX.Element => {
             mail: values.name,
             password: values.password
         }).then(res => {
-            if (res.status === 200) {
-                const { code, data, msg } = res.data
-                message[code === 0 ? 'success' : 'error']({
-                    content: msg
-                })
-                localStorage.setItem('AntdogToken', data?.token)
-            }
-            return res.data.code === 0
+            const { code, data, msg } = res
+            console.log('rrrrRequestDate',res);
+            
+            message[code === 0 ? 'success' : 'error']({
+                content: msg
+            })
+            localStorage.setItem('AntdogToken', data?.token)
+            return res.code === 0
         }).then(code => code && navigate(MANAGE_URL))
             .finally(() => {
                 setLoading(false)

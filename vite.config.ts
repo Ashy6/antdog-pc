@@ -7,7 +7,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
+        // target: 'https://www.bee456.com',
         target: 'https://2167d872c4.zicp.fun',
+        // target: '154.212.145.170:9001',
         changeOrigin: true,
         ws: true,
         rewrite: path => {

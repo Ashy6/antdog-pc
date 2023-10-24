@@ -1,4 +1,4 @@
-import { AxiosResponse, VITE_CONFIG, instance } from './utils'
+import { RequestDate, VITE_CONFIG, instance } from './utils'
 
 export interface OrderPage {
   orderNO?: string // 订单号
@@ -9,7 +9,8 @@ export interface OrderPage {
   pageSize?: number // 条数
 }
 
-export const getOrderPage = (options: OrderPage): Promise<AxiosResponse> => {
+// 获取订单列表
+export const getOrderPage = (options: OrderPage): Promise<RequestDate> => {
   return instance({
     url: `${VITE_CONFIG}/order/page`,
     method: 'post',

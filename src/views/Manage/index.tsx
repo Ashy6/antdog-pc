@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Layout, Space } from 'antd';
-import { getOrderPage } from '../../api/manage';
 
 import { Sidebar } from '../Sidebar';
 import { Container } from '../Container';
@@ -16,20 +15,6 @@ const { Header, Sider, Content } = Layout;
 
 export function Manage() {
     const [params, setParams] = useState<ActiveSidebar>({} as ActiveSidebar)
-
-    useEffect(() => {
-        const option = {
-            orderNO: '',
-            status: '',
-            subStatus: '',
-            page: 1,
-            pageSize: 8
-        }
-
-        getOrderPage(option).then(res => {
-            console.log('res', res);
-        })
-    }, []);
 
     const updateParams = (selectedMenuKeys: ActiveSidebar) => {
         setParams(selectedMenuKeys);
