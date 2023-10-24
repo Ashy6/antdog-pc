@@ -32,5 +32,11 @@ $foot-height: 90px;
 
     &-pagination {
         height: $foot-height;
+
+        .ant-pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
     }
 }

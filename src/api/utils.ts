@@ -56,12 +56,15 @@ instance.interceptors.response.use(
   }
 )
 
+export interface ResponseDate {
+  records?: AnyObject[]
+  msg?: string
+  [key: string]: AnyObject | any
+}
+
 export interface RequestDate {
   code?: number
-  data?: {
-    msg?: string
-    [key: string]: AnyObject | any
-  }
+  data: ResponseDate
   msg?: string
   result?: boolean
   timestamp?: number
