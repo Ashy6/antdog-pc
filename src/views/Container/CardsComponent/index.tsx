@@ -4,7 +4,7 @@ import icon from '../../../assets/png'
 import './style.scss'
 import { useState } from 'react';
 
-export const CardsComponent = props => {
+export const CardsComponent = (props: { value: AnyObject }) => {
     const { value } = props
 
 

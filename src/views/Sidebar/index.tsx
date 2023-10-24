@@ -26,7 +26,6 @@ export const Sidebar = (props: {
     >(SidebarSubMenuType.none)
 
     useEffect(() => {
-        console.log('activeMenu, activeSubMenu', activeMenu, activeSubMenu)
         const menuKey =
             activeMenu === SidebarMenuType.Ruling
                 ? (activeSubMenu as SidebarMenuType)
