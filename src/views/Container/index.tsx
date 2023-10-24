@@ -44,7 +44,7 @@ export const Container = (props: { select: ActiveSidebar }) => {
                 getPagePoints()
                 break
         }
-    }, [select, pagination])
+    }, [select, pagination.page])
 
     // 获取 Cards 数据
     const getPageCards = () => {
@@ -56,12 +56,10 @@ export const Container = (props: { select: ActiveSidebar }) => {
             pageSize: pagination.pageSize
         }
         getOrderPage(option).then(res => {
-            const { records, pages, total, size } = res.data
+            const { records, total } = res.data
             setPagination(value => ({
                 ...value,
-                page: pages,
                 total,
-                pageSize: size
             }))
             setList(records as AnyObject[])
         })
@@ -92,7 +90,7 @@ export const Container = (props: { select: ActiveSidebar }) => {
             </div>
             <div className='main-pagination'>
                 <Pagination
-                    defaultCurrent={pagination.page}
+                    current={pagination.page}
                     defaultPageSize={pagination.pageSize}
                     total={pagination.total}
                     showQuickJumper
