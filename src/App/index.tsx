@@ -3,7 +3,7 @@ import { ConfigProvider } from 'antd'
 import routes from '../route/root'
 import './global.scss'
 
-function RootApp() {
+function App() {
   return (
     <ConfigProvider
       theme={{
@@ -35,4 +35,4 @@ function RootApp() {
   )
 }
 
-export default RootApp
+export default App

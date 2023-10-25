@@ -6,17 +6,17 @@ interface RootRoutes {
   Ele: () => JSX.Element
 }
 
-export const LOGIN_URL = '/login'
 export const MANAGE_URL = '/'
+export const LOGIN_URL = '/login'
 
 const routes: RootRoutes[] = [
   {
     path: MANAGE_URL,
-    Ele: () => <Manage></Manage>
+    Ele: Manage
   },
   {
     path: LOGIN_URL,
-    Ele: () => <Login></Login>
+    Ele: Login
   }
 ]
 
