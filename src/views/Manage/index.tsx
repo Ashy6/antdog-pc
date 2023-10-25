@@ -17,7 +17,8 @@ const { Header, Sider, Content } = Layout
 export function Manage() {
     const [params, setParams] = useState<ActiveSidebar>({} as ActiveSidebar)
 
-    const [layoutFull, setLayoutFull] = useState(true)
+    // true 为详情页面
+    const [layoutFull, setLayoutFull] = useState(false)
 
     // Sidebar 状态
     const updateParams = (selectedMenuKeys: ActiveSidebar) => {

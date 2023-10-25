@@ -1,12 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react'
 import { Col, Pagination, Row } from 'antd'
-import { getOrderPage } from '../../api/cards.ts'
-import { getPointsOrderPage } from '../../api/points.ts'
+
+import { getPointsOrderPage } from '../../api/points'
+import { getOrderPage } from '../../api/cards'
 import { ActiveSidebar, SidebarMenuType } from '../Manage/types'
 
-import { CardsComponent } from '../CardsComponent'
-import { PointsComponent } from '../PointsComponent'
+import { CardsComponent } from '../component/CardsComponent'
+import { PointsComponent } from '../component/PointsComponent'
 
 import './style.scss'
 

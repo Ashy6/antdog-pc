@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { useState } from 'react'
 import { Button, Image } from 'antd'
 import icon from '../../../assets/png'
 import './style.scss'
-import { useState } from 'react'
 
 export const CardsComponent = (props: { value: AnyObject }) => {
     const { value } = props
