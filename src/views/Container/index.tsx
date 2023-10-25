@@ -5,8 +5,8 @@ import { getOrderPage } from '../../api/cards.ts'
 import { getPointsOrderPage } from '../../api/points.ts'
 import { ActiveSidebar, SidebarMenuType } from '../Manage/types'
 
-import { CardsComponent } from './CardsComponent'
-import { PointsComponent } from './PointsComponent'
+import { CardsComponent } from '../CardsComponent'
+import { PointsComponent } from '../PointsComponent'
 
 import './style.scss'
 

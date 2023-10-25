@@ -7,3 +7,23 @@
         height: 100%;
     }
 }
+
+// 卡片详情页 header
+.ant-layout-header.detail {
+    position: relative;
+    border-bottom: 3px solid #fafbf9;
+
+    span {
+        position: absolute;
+        left: 16px;
+        top: 26px;
+        font-size: 40px;
+        padding: 4px;
+        cursor: pointer;
+        transition: color 0.5s ease-in-out;
+
+        &:hover {
+            color: #02f7ff;
+        }
+    }
+}

@@ -13,6 +13,7 @@ export const headerStyle: React.CSSProperties = {
 export const contentStyle: React.CSSProperties = {
   textAlign: 'center',
   minHeight: 120,
+  height: `calc(100% - 100px)`,
   color: '#666',
   backgroundColor: '#fff'
 }
