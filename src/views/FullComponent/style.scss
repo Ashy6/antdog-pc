@@ -1,6 +1,15 @@
 .full-container {
+    /* 将内容分成三列 */
     column-count: 3;
-    column-gap: 20px;
+    /* 列之间的间距 */
+    column-gap: 30px;
     height: 100%;
     overflow: auto;
+    padding: 30px 20px 40px 20px;
+
+    .detail-content {
+        /* 防止内容被分割到不同的列中 */
+        break-inside: avoid-column;
+        margin-bottom: 20px;
+    }
 }

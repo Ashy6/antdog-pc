@@ -4,39 +4,44 @@ import { Button, Image } from 'antd'
 import icon from '../../../assets/png'
 import './style.scss'
 
-export const CardsComponent = (props: { value: AnyObject }) => {
-    const { value } = props
+export const CardsComponent = (props: {
+    value: AnyObject
+    isDetails?: boolean
+}) => {
+    const { value, isDetails } = props
     const {
         detailList, // 详情
-        advCode,    //
+        advCode, //
         amount, // 总金额
-        orderNo,    // 订单编号
-        currency,   // 币种
+        orderNo, // 订单编号
+        currency, // 币种
         createTime, // 创建时间
-        updateTime, // 更新时间
+        updateTime // 更新时间
     } = value
 
     const [img, setImg] = useState([
         'https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp',
-        'https://gw.alipayobjects.com/zos/antfincdn/cV16ZqzMjW/photo-1473091540282-9b846e7965e3.webp'
-        // 'https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp',
-        // 'https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp',
-        // 'https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp',
+        'https://gw.alipayobjects.com/zos/antfincdn/cV16ZqzMjW/photo-1473091540282-9b846e7965e3.webp',
+        'https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp',
+        'https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp',
+        'https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp'
     ])
 
     const formatTime = (createTime: string) => {
-        const date = new Date(createTime);
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1;
-        const day = date.getDate();
-        const hours = date.getHours();
-        const minutes = date.getMinutes();
-        const formattedDate = `${year}.${month}.${day} ${hours}:${minutes}`;
-        return formattedDate;
+        if (!createTime) return ''
+        const date = new Date(createTime)
+        const year = date.getFullYear()
+        const month = date.getMonth() + 1
+        const day = date.getDate()
+        const hours = date.getHours()
+        const minutes = date.getMinutes()
+        const formattedDate = `${year}.${month}.${day} ${hours}:${minutes}`
+        return formattedDate
     }
 
+    const componentClass = `card-item ${isDetails && 'detail-content'}`
     return (
-        <div className='card-item'>
+        <div className={componentClass}>
             {/* amount */}
             <div className='card-item-amount'>
                 <img className='card-item-icon left' src={icon.steam} alt='' />
@@ -79,7 +84,9 @@ export const CardsComponent = (props: { value: AnyObject }) => {
                             console.log(`current index: ${current}, prev index: ${prev}`)
                     }}
                 >
-                    {img.slice(0, 3).map((img, i) => (
+                    {/* TODO: 这里的样式渲染有问题，考虑每三个一组独立渲染
+                    每一组加 detail-content 类名保证不换行展示*/}
+                    {img.slice(0, isDetails ? img.length : 3).map((img, i) => (
                         <Image key={i} width={100} height={120} src={img} />
                     ))}
                     {/* 不满足三个展示空占位 */}
@@ -100,7 +107,9 @@ export const CardsComponent = (props: { value: AnyObject }) => {
             </div>
 
             {/* 图片超过三个显示 */}
-            {img.length > 3 && <div>······</div>}
+            {img.length > 3 && !isDetails && (
+                <div className='card-item-more'>······</div>
+            )}
 
             {/* In trade */}
             <div className='card-item-btn'>

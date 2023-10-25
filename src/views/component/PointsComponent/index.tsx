@@ -1,11 +1,12 @@
 import { Button } from 'antd';
 import './style.scss'
 
-export const PointsComponent = props => {
-    const { value } = props
+export const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
+    const { value, isDetails } = props
 
+    const componentClass = `card-item ${isDetails && 'detail-content'}`
     return (
-        <div className='card-item'>
+        <div className={componentClass}>
             {/* Points card */}
             <div className='card-item-card'>
                 Points
