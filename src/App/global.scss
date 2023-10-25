@@ -99,3 +99,8 @@ li {
   list-style-type: none;
   color: #000000;
 }
+
+.cursor-pointer {
+  cursor: pointer;
+  user-select: none;
+}

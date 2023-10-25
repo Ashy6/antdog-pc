@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, Image } from 'antd'
 import { useDispatch } from 'react-redux'
 import { updateSourceStore } from '../../../store/reducers/sourceState'
@@ -19,7 +19,8 @@ export const CardsComponent = (props: {
         orderNo, // 订单编号
         currency, // 币种
         createTime, // 创建时间
-        updateTime // 更新时间
+        updateTime, // 更新时间
+        images, // 图片，TODO：1. 如果命名不对按接口返回的字段为主
     } = value
 
     const dispatch = useDispatch()
@@ -31,6 +32,16 @@ export const CardsComponent = (props: {
         'https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp',
         'https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp'
     ])
+
+    /**
+     * TODO: 1 渲染图片
+     * 这里假设 传入的 images 需要二次处理，用这个 effect 来监听，然后处理后 set 到 img 里
+     * 这里详情页和卡片都用到了当前组件，在详情页中图片的展示没能平铺下去，不用管。
+     */
+    useEffect(() => {
+        const newImages = (images || []).map(item => item)
+        setImg(newImages)
+    }, [images]);
 
     const openDetails = () => {
         dispatch(updateSourceStore(value))
