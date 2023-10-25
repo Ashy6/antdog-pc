@@ -2,7 +2,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { Button } from 'antd'
+import { Button, Modal } from 'antd'
+import { CloseOutlined, CheckOutlined } from '@ant-design/icons'
 
 import { LOGIN_URL } from '../../route/root'
 import { MENUS } from '../Manage/data'
@@ -13,6 +14,8 @@ import {
 } from '../Manage/types'
 
 import './style.scss'
+
+const { confirm } = Modal;
 
 export const Sidebar = (props: {
     menusChange: (activeSidebar: ActiveSidebar) => void
@@ -39,9 +42,21 @@ export const Sidebar = (props: {
     }, [activeMenu, activeSubMenu])
 
     const onLogouClick = () => {
-        // TODO: 1.二次弹框确认   2.清除全局状态管理中的登录状态管理
-        localStorage.setItem('AntdogToken', '')
-        navigate(LOGIN_URL)
+        confirm({
+            className: 'antdog-enter-model',
+            maskClosable: true,
+            centered: true,
+            mask: false,
+            title: 'Are you logging out?',
+            icon: <></>,
+            okText: <><CheckOutlined /></>,
+            cancelText: <><CloseOutlined /></>,
+            onOk() {
+                localStorage.setItem('AntdogToken', '')
+                navigate(LOGIN_URL)
+            },
+            onCancel() { },
+        });
     }
 
     return (

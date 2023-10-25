@@ -16,6 +16,7 @@
   width: 100%;
 }
 
+// 全局按钮样式
 .antdog-btn {
   background-color: #0bced6;
   font-weight: 700;
@@ -36,6 +37,55 @@
 
   &:not(:first-child) {
     margin-left: 8px;
+  }
+}
+
+/**
+* 全局确认框样式
+* 二次确认框
+*/
+.antdog-enter-model {
+  .ant-modal-content {
+    width: 750px;
+    height: 280px;
+    background: rgba(226, 223, 223, 0.95);
+
+    .ant-modal-confirm-paragraph {
+      height: 160px;
+      text-align: center;
+
+      .ant-modal-confirm-title {
+        margin-top: 50px;
+        font-size: 44px;
+      }
+
+    }
+
+    .ant-modal-confirm-btns {
+      position: relative;
+
+      button {
+        border: 0;
+        background: linear-gradient(to bottom, #f4f4f5, #ccccd6);
+        width: 120px;
+        height: 50px;
+
+
+        .anticon {
+          font-size: 36px;
+          color: #000000;
+        }
+
+        &:first-child {
+          right: 40px;
+        }
+
+        &:last-child {
+          right: 400px;
+        }
+      }
+    }
+
   }
 }
 
