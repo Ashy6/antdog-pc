@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from 'react'
 import { Button, Image } from 'antd'
+import { useDispatch } from 'react-redux'
+import { updateSourceStore } from '../../../store/reducers/sourceState'
+
 import icon from '../../../assets/png'
 import './style.scss'
 
@@ -19,6 +22,8 @@ export const CardsComponent = (props: {
         updateTime // 更新时间
     } = value
 
+    const dispatch = useDispatch()
+
     const [img, setImg] = useState([
         'https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp',
         'https://gw.alipayobjects.com/zos/antfincdn/cV16ZqzMjW/photo-1473091540282-9b846e7965e3.webp',
@@ -26,6 +31,10 @@ export const CardsComponent = (props: {
         'https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp',
         'https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp'
     ])
+
+    const openDetails = () => {
+        dispatch(updateSourceStore(value))
+    }
 
     const formatTime = (createTime: string) => {
         if (!createTime) return ''
@@ -43,7 +52,7 @@ export const CardsComponent = (props: {
     return (
         <div className={componentClass}>
             {/* amount */}
-            <div className='card-item-amount'>
+            <div className='card-item-amount cursor-pointer' onClick={openDetails}>
                 <img className='card-item-icon left' src={icon.steam} alt='' />
                 <div className='amount'>
                     <label className='amount-title'>{advCode}</label>

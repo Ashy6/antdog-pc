@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Layout, Space } from 'antd'
 import { LeftOutlined } from '@ant-design/icons'
+import { useSelector, useDispatch } from 'react-redux'
+import { clearSourceStore } from '../../store/reducers/sourceState'
 
 import FullComponent from '../FullComponent'
 import { Sidebar } from '../Sidebar'
@@ -22,28 +24,17 @@ const detailsMap: { [key: string]: (source: AnyObject) => JSX.Element } = {
 }
 
 export function Manage() {
-    const [params, setParams] = useState<ActiveSidebar>({} as ActiveSidebar)
+    const sourceValue = useSelector((store: { source: AnyObject }) => store.source.value)
+    const dispatch = useDispatch();
 
-    // true 为详情页面
-    const [layoutFull, setLayoutFull] = useState(false)
-    const [source, setSource] = useState({})
+    const [params, setParams] = useState<ActiveSidebar>({} as ActiveSidebar)
 
     // Sidebar 状态
     const updateParams = (selectedMenuKeys: ActiveSidebar) => {
         setParams(selectedMenuKeys)
-        closeDetails()
+        dispatch(clearSourceStore())
     }
 
-    const openDetails = (source: AnyObject) => {
-        setLayoutFull(true)
-        setSource(source)
-    }
-
-    // 切换 Sidebar 关闭详情页
-    const closeDetails = () => {
-        setLayoutFull(false)
-        setSource({})
-    }
     return (
         <Space
             className='h-full w-full'
@@ -58,18 +49,18 @@ export function Manage() {
                 <Layout style={{ width: 'calc(100% - 256px)' }}>
                     <Header
                         style={headerStyle}
-                        className={layoutFull ? 'detail' : 'manage'}
+                        className={sourceValue ? 'detail' : 'manage'}
                     >
-                        {layoutFull ? (
-                            <LeftOutlined onClick={closeDetails} />
+                        {sourceValue ? (
+                            <LeftOutlined onClick={() => dispatch(clearSourceStore())} />
                         ) : (
                             <SearchInput />
                         )}
                     </Header>
                     <Content style={contentStyle}>
-                        {layoutFull ? (
+                        {sourceValue ? (
                             <FullComponent>
-                                {detailsMap[params.menuKey]?.(source)}
+                                {detailsMap[params.menuKey]?.(sourceValue)}
                             </FullComponent>
                         ) : (
                             <Container select={params} />

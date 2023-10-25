@@ -12,8 +12,8 @@ import { PointsComponent } from '../component/PointsComponent'
 import './style.scss'
 
 const component: { [key: string]: (props: AnyObject) => JSX.Element } = {
-    cards: props => <CardsComponent value={props}></CardsComponent>,
-    points: props => <PointsComponent value={props}></PointsComponent>
+    [SidebarMenuType.Cards]: props => <CardsComponent value={props}></CardsComponent>,
+    [SidebarMenuType.Points]: props => <PointsComponent value={props}></PointsComponent>
 }
 
 export const Container = (props: { select: ActiveSidebar }) => {

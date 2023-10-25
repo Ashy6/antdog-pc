@@ -1,14 +1,21 @@
 import { Button } from 'antd';
+import { useDispatch } from 'react-redux'
+import { updateSourceStore } from '../../../store/reducers/sourceState'
 import './style.scss'
 
 export const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
     const { value, isDetails } = props
 
+    const dispatch = useDispatch()
+
+    const openDetails = () => {
+        dispatch(updateSourceStore(value))
+    }
+
     const componentClass = `card-item ${isDetails && 'detail-content'}`
     return (
         <div className={componentClass}>
-            {/* Points card */}
-            <div className='card-item-card'>
+            <div className='card-item-card cursor-pointer' onClick={openDetails}>
                 Points
             </div>
 
