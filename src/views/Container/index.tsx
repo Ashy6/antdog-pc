@@ -1,7 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react'
 import { Col, Pagination, Row } from 'antd'
-import { getOrderPage } from '../../api/manage'
+import { getOrderPage } from '../../api/cards.ts'
+import { getPointsOrderPage } from '../../api/points.ts'
 import { ActiveSidebar, SidebarMenuType } from '../Manage/types'
 
 import { CardsComponent } from './CardsComponent'
@@ -66,7 +67,23 @@ export const Container = (props: { select: ActiveSidebar }) => {
     }
 
     // 获取 Points 数据
-    const getPagePoints = () => { }
+    const getPagePoints = () => {
+        const option = {
+            orderNO: '',
+            // status: null,
+            // subStatus: '',
+            page: pagination.page,
+            pageSize: pagination.pageSize
+        }
+        getPointsOrderPage(option).then(res => {
+            const { records, total } = res.data
+            setPagination(value => ({
+                ...value,
+                total,
+            }))
+            setList(records as AnyObject[])
+        })
+    }
 
     const onPageChange = (page: number) => {
         setPagination(value => ({

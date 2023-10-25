@@ -4,7 +4,8 @@ import { Codes } from './code'
 import { LOGIN_URL } from '../route/root'
 
 // export const API_URL = 'https://www.bee456.com'
-export const API_URL = 'https://2167d872c4.zicp.fun'
+// export const API_URL = 'https://2167d872c4.zicp.fun'
+export const API_URL = '127.0.0.1:9001'
 // export const API_URL = '154.212.145.170:9001'
 
 export const VITE_CONFIG = '/api/gcard/web'

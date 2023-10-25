@@ -44,7 +44,7 @@ export const CardsComponent = (props: { value: AnyObject }) => {
                     <label className='amount-title'>{advCode}</label>
                     <div className='amount-line'>
                         <span>Amount</span>
-                        <span>{amount}17</span>
+                        <span>{amount}</span>
                         <span>{currency}USD</span>
                     </div>
                     <div className='amount-line'>
