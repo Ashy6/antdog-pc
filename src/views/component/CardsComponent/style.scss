@@ -26,7 +26,7 @@
                 font-size: 16px;
                 display: flex;
                 justify-content: space-between;
-                align-content: center;            
+                align-content: center;
 
                 span {
                     padding: 0 8px;
@@ -53,9 +53,10 @@
             line-height: 24px;
             display: flex;
             justify-content: space-between;
-            align-content: center;    
+            align-content: center;
 
-            &:first-child, &:last-child {
+            &:first-child,
+            &:last-child {
                 background: #e9e9e9;
             }
 
@@ -126,4 +127,32 @@
             padding: 0 10%;
         }
     }
+}
+
+.ant-row-odd {
+    background: #e9e9e9;
+}
+
+.ant-row-odd,
+.ant-row-even {
+    padding: 4px;
+    text-align: center;
+}
+
+.ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select {
+    background-color: #f0f0f0;
+    border-radius: 6px;
+    width: 82px;
+    height: 82px;
+
+    .upload-btn {
+        span {
+            font-size: 28px;
+            color: #8c8c8c;
+        }
+    }
+}
+
+.desc-label {
+    margin-bottom: 6px;
 }

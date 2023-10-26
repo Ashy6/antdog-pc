@@ -1,11 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from 'react'
-import { Button, Image } from 'antd'
+import { Button, Image, Modal, Row, Col, Upload, Input } from 'antd'
 import { useDispatch } from 'react-redux'
 import { updateSourceStore } from '../../../store/reducers/sourceState'
 
 import icon from '../../../assets/png'
 import './style.scss'
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import type { UploadChangeParam } from 'antd/es/upload';
+import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
+
+const { TextArea } = Input;
+
 
 export const CardsComponent = (props: {
     value: AnyObject
@@ -21,6 +27,8 @@ export const CardsComponent = (props: {
         createTime, // 创建时间
         updateTime, // 更新时间
         images, // 图片，TODO：1. 如果命名不对按接口返回的字段为主
+        seller,      // 售卖人
+        rate        // 汇率
     } = value
 
     const dispatch = useDispatch()
@@ -60,6 +68,78 @@ export const CardsComponent = (props: {
     }
 
     const componentClass = `card-item ${isDetails && 'detail-content'}`
+    const [opened, setOpen] = useState(false);
+
+    const showModal = () => {
+        setOpen(true);
+    };
+
+    const handleOk = (e: React.MouseEvent<HTMLElement>) => {
+        console.log(e);
+        setOpen(false);
+    };
+
+    const handleCancel = (e: React.MouseEvent<HTMLElement>) => {
+        console.log(e);
+        setOpen(false);
+    };
+
+    const [loading, setLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList, file }) => {
+        setFileList(newFileList);
+    };
+
+    const [imageUrl, setImageUrl] = useState<string>();
+
+    const uploadButton = (
+        <div className='upload-btn'>
+            {uploading ? <LoadingOutlined /> : <PlusOutlined />}
+        </div>
+    );
+
+    const [description, setDescription] = useState('');
+
+    const modalDescriptions = [
+        { key: 1, postfix: 'odd', label: 'Order Number', value: [null, orderNo] },
+        { key: 2, postfix: 'even', label: 'Order Time', value: [null, formatTime(createTime)] },
+        { key: 3, postfix: 'odd', label: 'Seller', value: [null, seller] },
+        { key: 4, postfix: 'even', label: 'Order Amount', span: 3, value: [amount, `USD`] },
+        { key: 5, postfix: 'odd', label: 'Order Rate', span: 3, value: [rate || 999999, 'Points'] },
+        { key: 6, postfix: 'even', label: 'Negotiation Rate', span: 3, value: [rate || 999999, 'Points'] },
+        {
+            key: 7,
+            postfix: 'odd',
+            isControl: true,
+            span: 3,
+            label: <>
+                <div className='desc-label'>Description</div>
+                <Upload
+                    name="avatar"
+                    listType="picture-card"
+                    className="avatar-uploader"
+                    showUploadList={fileList.length > 0}
+                    fileList={fileList}
+                    action="/api/gcard/web/file/upload"
+                    onChange={handleChange}
+                >
+                    {imageUrl ? <img src={imageUrl} alt="avatar" /> : uploadButton}
+                </Upload>
+            </>,
+            value: [
+                <TextArea
+                    bordered={false}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Please describe the matter in detail and the platform will also question the seller.Combine all the circumstances and make a ruling."
+                    autoSize={{ minRows: 5, maxRows: 6 }}
+                />
+            ]
+        },
+    ]
+
     return (
         <div className={componentClass}>
             {/* amount */}
@@ -133,13 +213,40 @@ export const CardsComponent = (props: {
 
             {/* In trade */}
             <div className='card-item-btn'>
-                <Button className='antdog-btn' type='primary'>
+                <Button className='antdog-btn' type='primary' onClick={showModal}>
                     Negotiate
                 </Button>
                 <Button className='antdog-btn' type='primary'>
                     Release
                 </Button>
             </div>
+
+            <Modal
+                title="Negotiate"
+                open={opened}
+                closeIcon={null}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                footer={[
+                    <Button key="cancel" onClick={handleCancel}>
+                        Cancel
+                    </Button>,
+                    <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
+                        Confirm
+                    </Button>
+                ]}
+            >
+                {
+                    modalDescriptions.map(item => {
+                        return <Row key={item.key} className={`ant-row-${item.postfix}`}>
+                            <Col span={item.isControl ? 8 : 10}>{item.label}</Col>
+                            {item.value.map((v) => {
+                                return <Col key={item.key + '-' + v} span={v === null ? 4 : item.isControl ? 16 : item.span === 3 ? 7 : 10}>{v}</Col>
+                            })}
+                        </Row>;
+                    })
+                }
+            </Modal>
 
             {/* In dispute */}
             {/* <div className='card-item-btn short'>
