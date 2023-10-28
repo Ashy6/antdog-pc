@@ -45,7 +45,7 @@ export const releaseOrder = (orderNo: string): Promise<RequestDate> => {
  * @param options
  */
 export interface NegotiateParams {
-  orderNO?: string;
+  orderNo?: string;
   images?: string;
   description?: string;
   details?: [{
