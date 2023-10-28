@@ -7,7 +7,7 @@ import './style.scss'
 
 const { Search } = Input;
 
-export const SearchInput = () => {
+const SearchInput = () => {
     const dispatch = useDispatch()
 
     const onSearch: SearchProps['onSearch'] = (value) => {
@@ -18,3 +18,5 @@ export const SearchInput = () => {
         <Search className="search-input" placeholder="Please enter the order number" onSearch={onSearch} size="middle" />
     </div>
 }
+
+export default SearchInput

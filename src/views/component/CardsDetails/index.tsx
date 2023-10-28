@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { CardsComponent } from '../CardsComponent'
+import CardsComponent from '../CardsComponent'
 import './style.scss'
 
-export const CardsDetails = ({ source }: { source: AnyObject }) => {
+const CardsDetails = ({ source }: { source: AnyObject }) => {
     const {
         logs // 日志，TODO：3. 如果命名不对按接口返回的字段为主，我理解这里有个打印日志
     } = source
@@ -32,3 +32,5 @@ export const CardsDetails = ({ source }: { source: AnyObject }) => {
         </>
     )
 }
+
+export default CardsDetails

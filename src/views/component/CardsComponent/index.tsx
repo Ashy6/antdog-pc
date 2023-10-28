@@ -1,26 +1,29 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { ChangeEventHandler, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Button, Image, Modal, Row, Col, Upload, Input, InputNumber } from 'antd'
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
-import { useDispatch, useSelector } from 'react-redux'
 import { updateSourceStore } from '../../../store/reducers/sourceState'
 import { freezeUserPoints } from '../../../store/reducers/userState'
 
-import icon from '../../../assets/png'
 import { negotiate, releaseOrder } from '../../../api/cards'
 import { OrderStatus } from '../../../types/order-status'
-import './style.scss'
 import { formatTime } from '../../../utils/time'
+import { SelectParamsType } from '../../../types/types';
+import icon from '../../../assets/png'
+
+import './style.scss'
 
 const { TextArea } = Input;
 
-
-export const CardsComponent = (props: {
+const CardsComponent = (props: {
     value: AnyObject
     isDetails?: boolean
 }) => {
+
     const { value, isDetails } = props
+
     const {
         id: orderId,
         detailList = [], // 详情
@@ -38,9 +41,11 @@ export const CardsComponent = (props: {
         status
     } = value;
 
-    const userInfo = useSelector((store: { userInfo: AnyObject }) => store.userInfo.value)
     const dispatch = useDispatch()
+    const userInfo = useSelector((store: { userInfo: AnyObject }) => store.userInfo.value)
+    const selectValue = useSelector((store: { selectInfo: { value: SelectParamsType } }) => store.selectInfo.value)
 
+    const [loading, setLoading] = useState(false);
     const [img, setImg] = useState([
         'https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp',
         'https://gw.alipayobjects.com/zos/antfincdn/cV16ZqzMjW/photo-1473091540282-9b846e7965e3.webp',
@@ -55,17 +60,20 @@ export const CardsComponent = (props: {
     const [negotiationRate, setNegotiationRate] = useState(detailList[0]?.rate);
     const [rulingRate, setRulingRate] = useState(detailList[0]?.rate);
     const [orderStatus, setOrderStatus] = useState(status || OrderStatus.noSubmit);
+
     useEffect(() => {
         setOrderStatus(status);
     }, [status]);
+
     /**
      * TODO: 1 渲染图片
      * 这里假设 传入的 images 需要二次处理，用这个 effect 来监听，然后处理后 set 到 img 里
      * 这里详情页和卡片都用到了当前组件，在详情页中图片的展示没能平铺下去，不用管。
      */
     useEffect(() => {
-        const newImages = (images || []).map(item => item)
-        setImg(newImages)
+        if (images && images.length) {
+            setImg(images.split(','))
+        }
     }, [images]);
 
     const openDetails = () => {
@@ -79,8 +87,6 @@ export const CardsComponent = (props: {
     const showRulingModal = () => {
         setRulingOpened(true);
     };
-
-    const [loading, setLoading] = useState(false);
 
     const handleOk = async (e: React.MouseEvent<HTMLElement>) => {
         setLoading(true);
@@ -100,8 +106,6 @@ export const CardsComponent = (props: {
         });
         // 冻结积分数
         dispatch(freezeUserPoints(negotiationRate || detailList[0]?.rate))
-
-        console.log("提交协商返回结果：", response);
         setOrderStatus(OrderStatus.applyNegotiate);
         setOpen(false);
         setLoading(false);
@@ -250,7 +254,7 @@ export const CardsComponent = (props: {
         }
     ];
 
-    const componentClass = `card-item ${isDetails && 'detail-content'}`;
+    const componentClass = `card-item ${isDetails ? 'detail-content' : ''}`;
     return (
         <div className={componentClass}>
             {/* amount */}
@@ -289,12 +293,7 @@ export const CardsComponent = (props: {
 
             {/* images */}
             <div className='card-item-images'>
-                <Image.PreviewGroup
-                    preview={{
-                        onChange: (current, prev) =>
-                            console.log(`current index: ${current}, prev index: ${prev}`)
-                    }}
-                >
+                <Image.PreviewGroup>
                     {/* TODO: 这里的样式渲染有问题，考虑每三个一组独立渲染
                     每一组加 detail-content 类名保证不换行展示*/}
                     {img.slice(0, isDetails ? img.length : 3).map((img, i) => (
@@ -303,7 +302,7 @@ export const CardsComponent = (props: {
                     {/* 不满足三个展示空占位 */}
                     {img.length < 3 &&
                         Array.from({ length: 3 - img.length }, (_, i) => (
-                            <div className='ant-image' key={`empty-${i}`}></div>
+                            <div className='ant-image' key={`empty-${i}`} style={{ height: 120 }}></div>
                         ))}
                 </Image.PreviewGroup>
             </div>
@@ -350,6 +349,7 @@ export const CardsComponent = (props: {
                     })
                 }
             </Modal>
+
             <Modal
                 className='negotiate-dialog'
                 title="Negotiate"
@@ -378,6 +378,7 @@ export const CardsComponent = (props: {
                     })
                 }
             </Modal>
+
             {/* In trade */}
             {orderStatus === OrderStatus.noSubmit && <div className='card-item-btn'>
                 <Button className='antdog-btn' type='primary' onClick={showModal}>
@@ -396,18 +397,9 @@ export const CardsComponent = (props: {
             </div>}
 
             {/* wait */}
-            {/* {<div className='card-item-btn'>
+            {orderStatus === OrderStatus.waitingArbitration && <div div className='card-item-btn'>
                 <Button className='antdog-btn disabled' type="primary" disabled>
                     Platform is in arbitration,please wait
-                </Button>
-            </div>} */}
-
-            {<div className='card-item-btn'>
-                <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
-                    Seller Win
-                </Button>
-                <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
-                    Buyer Win
                 </Button>
             </div>}
 
@@ -417,6 +409,18 @@ export const CardsComponent = (props: {
                     Order Completed
                 </Button>
             </div>}
-        </div>
+
+            {/* Ruling */}
+            {selectValue.isRuling && <div className='card-item-btn'>
+                <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
+                    Seller Win
+                </Button>
+                <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
+                    Buyer Win
+                </Button>
+            </div>}
+        </div >
     )
 }
+
+export default CardsComponent

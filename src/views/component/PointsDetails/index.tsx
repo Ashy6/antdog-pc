@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { PointsComponent } from '../PointsComponent'
+import PointsComponent from '../PointsComponent'
 import './style.scss'
 
-export const PointsDetails = ({ source }: { source: AnyObject }) => {
+const PointsDetails = ({ source }: { source: AnyObject }) => {
     const {
         logs // 日志，TODO：2. 如果命名不对按接口返回的字段为主，我理解这里有个打印日志
     } = source
@@ -32,3 +32,5 @@ export const PointsDetails = ({ source }: { source: AnyObject }) => {
         </>
     )
 }
+
+export default PointsDetails

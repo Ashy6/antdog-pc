@@ -1,17 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Button, Col, InputNumber, Modal, Row, Upload, UploadFile, Image, UploadProps } from 'antd';
-import { useDispatch } from 'react-redux'
-import { updateSourceStore } from '../../../store/reducers/sourceState'
-import './style.scss'
 import { useEffect, useState } from 'react';
-import { OrderStatus } from '../../../types/order-status';
+import { useDispatch, useSelector } from 'react-redux'
+import { Button, Col, Modal, Row, Upload, UploadFile, Image, UploadProps } from 'antd';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import TextArea from 'antd/es/input/TextArea';
-import { formatTime } from '../../../utils/time';
-import { cancelPointsOrder, paidPointsOrder } from '../../../api/points';
-import { freezeUserPoints } from '../../../store/reducers/userState';
 
-export const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
+import { cancelPointsOrder, paidPointsOrder } from '../../../api/points';
+import { updateSourceStore } from '../../../store/reducers/sourceState'
+import { freezeUserPoints } from '../../../store/reducers/userState';
+import { OrderStatus } from '../../../types/order-status';
+import { formatTime } from '../../../utils/time';
+import { SelectParamsType } from '../../../types/types';
+import './style.scss'
+
+const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
     const { value, isDetails } = props
 
     const {
@@ -24,21 +26,17 @@ export const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }
     } = value;
     const dispatch = useDispatch()
 
-    const openDetails = () => {
-        dispatch(updateSourceStore(value))
-    }
+    const selectValue = useSelector((store: { selectInfo: { value: SelectParamsType } }) => store.selectInfo.value)
 
     const [description, setDescription] = useState('');
-
+    const [rulingOpened, setRulingOpened] = useState(false);
     const [opened, setOpen] = useState(false);
-    const [action, setAction] = useState('');
-
-    const showModal = () => {
-        setOpen(true);
-    };
 
     const [loading, setLoading] = useState(false);
     const [orderStatus, setOrderStatus] = useState(status);
+
+    const [uploading, setUploading] = useState(false);
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
 
     useEffect(() => {
         setOrderStatus(status);
@@ -48,6 +46,10 @@ export const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }
         // TODO: 二次弹窗
         await cancelPointsOrder(orderNo);
         setOrderStatus(OrderStatus.cancel);
+    }
+
+    const openDetails = () => {
+        dispatch(updateSourceStore(value))
     }
 
     const handleOk = async (e: React.MouseEvent<HTMLElement>) => {
@@ -67,9 +69,6 @@ export const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }
         setOpen(false);
     };
 
-    const [uploading, setUploading] = useState(false);
-    const [fileList, setFileList] = useState<UploadFile[]>([]);
-
     const handleChange: UploadProps['onChange'] = ({ fileList: newFileList, file }) => {
         if (file.status === 'uploading') {
             setUploading(true);
@@ -77,6 +76,14 @@ export const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }
             setUploading(false);
         }
         setFileList(newFileList);
+    };
+
+    const showModal = () => {
+        setOpen(true);
+    };
+
+    const showRulingModal = () => {
+        setRulingOpened(true);
     };
 
     const modalDescriptions = [
@@ -269,6 +276,18 @@ export const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }
                     Order Completed
                 </Button>
             </div>}
+
+
+            {selectValue.isRuling && <div className='card-item-btn'>
+                <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
+                    Seller Win
+                </Button>
+                <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
+                    Buyer Win
+                </Button>
+            </div>}
         </div>
     )
 }
+
+export default PointsComponent

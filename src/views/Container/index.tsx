@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Col, Pagination, Row } from 'antd'
 
-import { CardsComponent } from '../component/CardsComponent'
-import { PointsComponent } from '../component/PointsComponent'
+import CardsComponent from '../component/CardsComponent'
+import PointsComponent from '../component/PointsComponent'
 
 import { getPointsOrderPage } from '../../api/points'
 import { getOrderPage } from '../../api/cards'
@@ -17,7 +17,7 @@ const component: { [key: string]: (props: AnyObject) => JSX.Element } = {
     [SidebarMenuType.Points]: props => <PointsComponent value={props}></PointsComponent>
 }
 
-export const Container = () => {
+const Container = () => {
     const selectValue = useSelector((store: { selectInfo: { value: SelectParamsType } }) => store.selectInfo.value)
 
     const [pagination, setPagination] = useState({
@@ -109,3 +109,5 @@ export const Container = () => {
         </div>
     )
 }
+
+export default Container
