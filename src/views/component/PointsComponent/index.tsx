@@ -8,7 +8,7 @@ import { OrderStatus } from '../../../types/order-status';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import TextArea from 'antd/es/input/TextArea';
 import { formatTime } from '../../../utils/time';
-import { paidPointsOrder } from '../../../api/points';
+import { cancelPointsOrder, paidPointsOrder } from '../../../api/points';
 import { freezeUserPoints } from '../../../store/reducers/userState';
 
 export const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
@@ -31,6 +31,7 @@ export const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }
     const [description, setDescription] = useState('');
 
     const [opened, setOpen] = useState(false);
+    const [action, setAction] = useState('');
 
     const showModal = () => {
         setOpen(true);
@@ -42,6 +43,12 @@ export const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }
     useEffect(() => {
         setOrderStatus(status);
     }, [status]);
+
+    const cancelOrder = async () => {
+        // TODO: 二次弹窗
+        await cancelPointsOrder(orderNo);
+        setOrderStatus(OrderStatus.cancel);
+    }
 
     const handleOk = async (e: React.MouseEvent<HTMLElement>) => {
         setLoading(true);
@@ -231,7 +238,7 @@ export const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }
             </Modal>}
             {/* In trade */}
             {[OrderStatus.noSubmit, OrderStatus.normal].includes(orderStatus) && <div className='card-item-btn'>
-                <Button className='antdog-btn' type="primary" onClick={showModal}>Cancel</Button>
+                <Button className='antdog-btn' type="primary" onClick={cancelOrder}>Cancel</Button>
                 <Button className='antdog-btn' type="primary" onClick={showModal}>
                     Paid
                 </Button>
