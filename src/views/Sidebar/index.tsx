@@ -2,27 +2,26 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Button, Modal } from 'antd'
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons'
 
+import { clearSourceStore } from '../../store/reducers/sourceState'
+import { updateSelect } from '../../store/reducers/selectState'
 import { LOGIN_URL } from '../../route/root'
 import { MENUS } from '../Manage/data'
-import {
-    ActiveSidebar,
-    SidebarMenuType,
-    SidebarSubMenuType
-} from '../Manage/types'
+import { SidebarMenuType, SidebarSubMenuType } from '../../types/types'
 
 import './style.scss'
-import { useSelector } from 'react-redux'
 
-const { confirm } = Modal;
+const { confirm } = Modal
 
-export const Sidebar = (props: {
-    menusChange: (activeSidebar: ActiveSidebar) => void
-}) => {
+const Sidebar = () => {
     const navigate = useNavigate()
-    const userInfo = useSelector((store: { userInfo: AnyObject }) => store.userInfo.value)
+    const dispatch = useDispatch()
+    const userInfo = useSelector(
+        (store: { userInfo: AnyObject }) => store.userInfo.value
+    )
 
     const [activeMenu, setActiveMenu] = useState(MENUS[0].key)
     const [activeSubMenu, setActiveSubMenu] = useState<
@@ -35,11 +34,17 @@ export const Sidebar = (props: {
                 ? (activeSubMenu as SidebarMenuType)
                 : activeMenu
         const subMenuKey = activeSubMenu
-        props.menusChange({
-            menuKey,
-            subMenuKey,
-            isRuling: activeMenu === SidebarMenuType.Ruling
-        })
+
+        dispatch(
+            updateSelect({
+                menuKey,
+                subMenuKey,
+                isRuling: activeMenu === SidebarMenuType.Ruling
+            })
+        )
+
+        // 切换清空详情信息
+        dispatch(clearSourceStore())
     }, [activeMenu, activeSubMenu])
 
     const onLogouClick = () => {
@@ -50,14 +55,22 @@ export const Sidebar = (props: {
             mask: false,
             title: 'Are you logging out?',
             icon: <></>,
-            okText: <><CheckOutlined /></>,
-            cancelText: <><CloseOutlined /></>,
+            okText: (
+                <>
+                    <CheckOutlined />
+                </>
+            ),
+            cancelText: (
+                <>
+                    <CloseOutlined />
+                </>
+            ),
             onOk() {
                 localStorage.setItem('AntdogToken', '')
                 navigate(LOGIN_URL)
             },
-            onCancel() { },
-        });
+            onCancel() { }
+        })
     }
 
     return (
@@ -101,7 +114,11 @@ export const Sidebar = (props: {
                                     setActiveSubMenu(submenu.key)
                                 } else {
                                     // 子菜单有 取消选中逻辑
-                                    setActiveSubMenu(submenu.key === activeSubMenu ? SidebarSubMenuType.none : submenu.key)
+                                    setActiveSubMenu(
+                                        submenu.key === activeSubMenu
+                                            ? SidebarSubMenuType.none
+                                            : submenu.key
+                                    )
                                 }
                             }}
                         >
@@ -118,3 +135,5 @@ export const Sidebar = (props: {
         </div>
     )
 }
+
+export default Sidebar

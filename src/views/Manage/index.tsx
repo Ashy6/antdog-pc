@@ -1,18 +1,17 @@
-import { useState } from 'react'
 import { Layout, Space } from 'antd'
 import { LeftOutlined } from '@ant-design/icons'
 import { useSelector, useDispatch } from 'react-redux'
 import { clearSourceStore } from '../../store/reducers/sourceState'
 
 import FullComponent from '../FullComponent'
-import { Sidebar } from '../Sidebar'
+import Sidebar from '../Sidebar'
 import { Container } from '../Container'
 import { SearchInput } from '../SearchInput'
 import { CardsDetails } from '../component/CardsDetails'
 import { PointsDetails } from '../component/PointsDetails'
 
 import { contentStyle, headerStyle, siderStyle } from './data'
-import { ActiveSidebar, SidebarMenuType } from './types'
+import { SelectParamsType, SidebarMenuType } from '../../types/types'
 
 import './style.scss'
 
@@ -25,15 +24,8 @@ const detailsMap: { [key: string]: (source: AnyObject) => JSX.Element } = {
 
 export function Manage() {
     const sourceValue = useSelector((store: { source: AnyObject }) => store.source.value)
+    const selectValue = useSelector((store: { selectInfo: { value: SelectParamsType } }) => store.selectInfo.value)
     const dispatch = useDispatch();
-
-    const [params, setParams] = useState<ActiveSidebar>({} as ActiveSidebar)
-
-    // Sidebar 状态
-    const updateParams = (selectedMenuKeys: ActiveSidebar) => {
-        setParams(selectedMenuKeys)
-        dispatch(clearSourceStore())
-    }
 
     return (
         <Space
@@ -44,7 +36,7 @@ export function Manage() {
         >
             <Layout>
                 <Sider theme='light' style={siderStyle} width='256px'>
-                    <Sidebar menusChange={updateParams}></Sidebar>
+                    <Sidebar />
                 </Sider>
                 <Layout style={{ width: 'calc(100% - 256px)' }}>
                     <Header
@@ -60,10 +52,10 @@ export function Manage() {
                     <Content style={contentStyle}>
                         {sourceValue ? (
                             <FullComponent>
-                                {detailsMap[params.menuKey]?.(sourceValue)}
+                                {detailsMap[selectValue.menuKey]?.(sourceValue)}
                             </FullComponent>
                         ) : (
-                            <Container select={params} />
+                            <Container />
                         )}
                     </Content>
                 </Layout>

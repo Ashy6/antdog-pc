@@ -1,13 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { Col, Pagination, Row } from 'antd'
-
-import { getPointsOrderPage } from '../../api/points'
-import { getOrderPage } from '../../api/cards'
-import { ActiveSidebar, SidebarMenuType } from '../Manage/types'
 
 import { CardsComponent } from '../component/CardsComponent'
 import { PointsComponent } from '../component/PointsComponent'
+
+import { getPointsOrderPage } from '../../api/points'
+import { getOrderPage } from '../../api/cards'
+import { SelectParamsType, SidebarMenuType } from '../../types/types'
 
 import './style.scss'
 
@@ -16,9 +17,8 @@ const component: { [key: string]: (props: AnyObject) => JSX.Element } = {
     [SidebarMenuType.Points]: props => <PointsComponent value={props}></PointsComponent>
 }
 
-export const Container = (props: { select: ActiveSidebar }) => {
-    const { select } = props
-    const { menuKey, subMenuKey, isRuling } = select
+export const Container = () => {
+    const selectValue = useSelector((store: { selectInfo: { value: SelectParamsType } }) => store.selectInfo.value)
 
     const [pagination, setPagination] = useState({
         page: 1,
@@ -38,53 +38,42 @@ export const Container = (props: { select: ActiveSidebar }) => {
     ])
 
     useEffect(() => {
-        switch (menuKey) {
+        const params = {
+            ...selectValue.params,
+            page: pagination.page,
+            pageSize: pagination.pageSize
+        }
+        const { status, subStatus } = selectValue.params
+        status && (params.status = status)
+        subStatus && (params.subStatus = subStatus)
+
+        switch (selectValue.menuKey) {
+            // 获取 Cards 数据
             case SidebarMenuType.Cards:
-                getPageCards()
+                getOrderPage(params).then(res => {
+                    const { records, total } = res.data
+                    setPagination(value => ({
+                        ...value,
+                        total,
+                    }))
+                    setList(records as AnyObject[])
+                })
                 break
+            // 获取 Points 数据
             case SidebarMenuType.Points:
-                getPagePoints()
+                getPointsOrderPage(params).then(res => {
+                    const { records, total } = res.data
+                    setPagination(value => ({
+                        ...value,
+                        total,
+                    }))
+                    setList(records as AnyObject[])
+                })
                 break
-        }
-    }, [select, pagination.page])
 
-    // 获取 Cards 数据
-    const getPageCards = () => {
-        const option = {
-            orderNO: '',
-            // status: null,
-            // subStatus: '',
-            page: pagination.page,
-            pageSize: pagination.pageSize
+            // TODO：获取 Ruling 接口
         }
-        getOrderPage(option).then(res => {
-            const { records, total } = res.data
-            setPagination(value => ({
-                ...value,
-                total,
-            }))
-            setList(records as AnyObject[])
-        })
-    }
-
-    // 获取 Points 数据
-    const getPagePoints = () => {
-        const option = {
-            orderNO: '',
-            // status: null,
-            // subStatus: '',
-            page: pagination.page,
-            pageSize: pagination.pageSize
-        }
-        getPointsOrderPage(option).then(res => {
-            const { records, total } = res.data
-            setPagination(value => ({
-                ...value,
-                total,
-            }))
-            setList(records as AnyObject[])
-        })
-    }
+    }, [selectValue, pagination.page])
 
     const onPageChange = (page: number) => {
         setPagination(value => ({
@@ -100,7 +89,7 @@ export const Container = (props: { select: ActiveSidebar }) => {
                     {list.map((source, i) => {
                         return (
                             <Col className='gutter-row' key={i} span={6}>
-                                {component[menuKey]?.(source)}
+                                {component[selectValue.menuKey]?.(source)}
                             </Col>
                         )
                     })}

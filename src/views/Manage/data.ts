@@ -1,5 +1,5 @@
 import React from "react"
-import { Menu, SidebarMenuType, SidebarSubMenuType } from "./types"
+import { Menu, SidebarMenuType, SidebarSubMenuType } from "../../types/types"
 
 export const headerStyle: React.CSSProperties = {
   textAlign: 'center',

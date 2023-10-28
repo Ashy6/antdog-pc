@@ -1,3 +1,5 @@
+import { OrderStatus } from "./order-status"
+
 /**
  * Sidebar 传参相关类型
  */
@@ -34,4 +36,12 @@ export interface ActiveSidebar {
   menuKey: SidebarMenuType
   subMenuKey: SidebarMenuType | SidebarSubMenuType
   isRuling: boolean
+}
+
+export interface SelectParamsType extends ActiveSidebar {
+  params: {
+    orderNO: string // 搜索过滤条件
+    status?: OrderStatus // 由 subMenu 控制
+    subStatus?: number
+  }
 }

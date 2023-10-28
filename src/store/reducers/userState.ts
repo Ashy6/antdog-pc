@@ -1,8 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { message } from 'antd'
 
+/**
+ * 存储用（商）户信息的 store
+ */
 const userStateSlice = createSlice({
-  name: 'sourceState',
+  name: 'userStore',
   initialState: {
     value: {
       mail: '',
