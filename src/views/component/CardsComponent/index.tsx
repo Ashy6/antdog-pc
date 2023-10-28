@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useEffect, useState } from 'react'
-import { Button, Image, Modal, Row, Col, Upload, Input } from 'antd'
+import React, { ChangeEventHandler, useEffect, useState } from 'react'
+import { Button, Image, Modal, Row, Col, Upload, Input, InputNumber } from 'antd'
 import { useDispatch } from 'react-redux'
 import { updateSourceStore } from '../../../store/reducers/sourceState'
 
 import icon from '../../../assets/png'
 import './style.scss'
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
-import type { UploadChangeParam } from 'antd/es/upload';
-import type { RcFile, UploadFile, UploadProps } from 'antd/es/upload/interface';
+import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
+import { negotiate } from '../../../api/cards'
+import { OrderStatus } from '../../../types/order-status'
 
 const { TextArea } = Input;
 
@@ -19,7 +20,8 @@ export const CardsComponent = (props: {
 }) => {
     const { value, isDetails } = props
     const {
-        detailList, // 详情
+        id: orderId,
+        detailList = [], // 详情
         advCode, //
         amount, // 总金额
         orderNo, // 订单编号
@@ -28,8 +30,10 @@ export const CardsComponent = (props: {
         updateTime, // 更新时间
         images, // 图片，TODO：1. 如果命名不对按接口返回的字段为主
         seller,      // 售卖人
-        rate        // 汇率
-    } = value
+        rate,        // 汇率
+        cardType,
+        status
+    } = value;
 
     const dispatch = useDispatch()
 
@@ -41,6 +45,9 @@ export const CardsComponent = (props: {
         'https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp'
     ])
 
+    const [description, setDescription] = useState('');
+    const [negotiationRate, setNegotiationRate] = useState(rate);
+    const [orderStatus, setOrderStatus] = useState(status || OrderStatus.noSubmit);
     /**
      * TODO: 1 渲染图片
      * 这里假设 传入的 images 需要二次处理，用这个 effect 来监听，然后处理后 set 到 img 里
@@ -74,34 +81,55 @@ export const CardsComponent = (props: {
         setOpen(true);
     };
 
-    const handleOk = (e: React.MouseEvent<HTMLElement>) => {
-        console.log(e);
+    const [loading, setLoading] = useState(false);
+
+    const handleOk = async (e: React.MouseEvent<HTMLElement>) => {
+        setLoading(true);
+        const response = await negotiate({
+            "orderNo": orderNo,
+            "details": [
+                {
+                    "id": orderId,
+                    "orderNo": orderNo,
+                    "finalFaceValue": negotiationRate,
+                    "memo": ""
+                }
+            ],
+            "images": fileList.map(x => x.response?.data).filter(x => Boolean(x)).join(),
+            "description": description
+        });
+        console.log("提交协商返回结果：", response);
+        setOrderStatus(OrderStatus.applyNegotiate);
         setOpen(false);
+        setLoading(false);
     };
 
     const handleCancel = (e: React.MouseEvent<HTMLElement>) => {
-        console.log(e);
         setOpen(false);
     };
 
-    const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
 
-    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList, file }) => {
-        // console.log(file.status);
+    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
         setFileList(newFileList);
     };
 
-    const [description, setDescription] = useState('');
+    const negotiateRateChange = (value: number) => {
+        setNegotiationRate(value);
+    };
 
     const modalDescriptions = [
         { key: 1, postfix: 'odd', label: 'Order Number', value: [null, orderNo] },
         { key: 2, postfix: 'even', label: 'Order Time', value: [null, formatTime(createTime)] },
         { key: 3, postfix: 'odd', label: 'Seller', value: [null, seller] },
         { key: 4, postfix: 'even', label: 'Order Amount', span: 3, value: [amount, `USD`] },
-        { key: 5, postfix: 'odd', label: 'Order Rate', span: 3, value: [rate || 999999, 'Points'] },
-        { key: 6, postfix: 'even', label: 'Negotiation Rate', span: 3, value: [rate || 999999, 'Points'] },
+        { key: 5, postfix: 'odd', label: 'Order Rate', span: 3, value: [detailList[0]?.rate, 'Points'] },
+        {
+            key: 6, postfix: 'even', label: 'Negotiation Rate', span: 3, value: [
+                <InputNumber min={0} max={detailList[0]?.rate} value={negotiationRate} defaultValue={detailList[0]?.rate} onChange={negotiateRateChange} />, 'Points'
+            ]
+        },
         {
             key: 7,
             postfix: 'odd',
@@ -219,21 +247,12 @@ export const CardsComponent = (props: {
                 <div className='card-item-more'>······</div>
             )}
 
-            {/* In trade */}
-            <div className='card-item-btn'>
-                <Button className='antdog-btn' type='primary' onClick={showModal}>
-                    Negotiate
-                </Button>
-                <Button className='antdog-btn' type='primary'>
-                    Release
-                </Button>
-            </div>
-
             <Modal
                 className='negotiate-dialog'
                 title="Negotiate"
                 open={opened}
                 closeIcon={null}
+                destroyOnClose={true}
                 onOk={handleOk}
                 onCancel={handleCancel}
                 footer={[
@@ -257,12 +276,22 @@ export const CardsComponent = (props: {
                 }
             </Modal>
 
+            {/* In trade */}
+            {orderStatus === OrderStatus.noSubmit && <div className='card-item-btn'>
+                <Button className='antdog-btn' type='primary' onClick={showModal}>
+                    Negotiate
+                </Button>
+                <Button className='antdog-btn' type='primary'>
+                    Release
+                </Button>
+            </div>}
+
             {/* In dispute */}
-            {/* <div className='card-item-btn short'>
+            {orderStatus === OrderStatus.applyNegotiate && <div className='card-item-btn short'>
                 <Button className='antdog-btn disabled' type="primary" disabled>
                     In dispute
                 </Button>
-            </div> */}
+            </div>}
 
             {/* wait */}
             {/* <div className='card-item-btn'>
