@@ -48,6 +48,9 @@ const Container = () => {
         subStatus && (params['subStatus'] = subStatus)
 
         switch (selectValue.menuKey) {
+            // TODO：获取 Ruling 接口
+            case SidebarMenuType.Ruling:
+                return
             // 获取 Cards 数据
             case SidebarMenuType.Cards:
                 getOrderPage(params).then(res => {
@@ -70,8 +73,6 @@ const Container = () => {
                     setList(records as AnyObject[])
                 })
                 break
-
-            // TODO：获取 Ruling 接口
         }
     }, [selectValue, pagination.page])
 
