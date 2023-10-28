@@ -1,4 +1,4 @@
-@use 'src/App/variable.scss' as variable;
+@use 'src/App/variable.scss'as variable;
 
 .search-input-component {
     border-bottom: 3px solid #eee;
@@ -33,6 +33,17 @@
                         .anticon-search {
                             font-size: 22px;
                         }
+                    }
+
+                    // 去掉子 div 样式
+                    &>div {
+                        display: none;
+                    }
+
+                    &:not(:disabled):focus-visible {
+                        outline: 0;
+                        outline-offset: 0px;
+                        transition: outline-offset 0s, outline 0s;
                     }
                 }
             }

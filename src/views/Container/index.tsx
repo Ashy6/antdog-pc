@@ -83,9 +83,9 @@ const Container = () => {
     }
 
     return (
-        <div className='main h-100'>
+        <div className='container h-100'>
             {
-                list?.length ? (<div className='main-cards'>
+                list?.length ? (<div className='container-cards'>
                     <Row className='cards' gutter={[32, 16]}>
                         {list.map((source, i) => {
                             return (
@@ -97,7 +97,7 @@ const Container = () => {
                     </Row>
                 </div>) : <EmptyComponent />
             }
-            <div className='main-pagination'>
+            <div className='container-pagination'>
                 <Pagination
                     current={pagination.page}
                     defaultPageSize={pagination.pageSize}

@@ -1,6 +1,8 @@
+@use '../../App/variable.scss' as var;
+
 .antdog-empty {
     width: 100%;
-    height: calc(100% - 90px);
+    height: calc(100% - var.$foot-height);
     padding-top: 7%;
     text-align: center;
     font-size: 40px;
