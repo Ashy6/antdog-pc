@@ -8,7 +8,7 @@ const userStateSlice = createSlice({
       mail: '',
       merchName: '',
       merchNo: '',
-      points: 0,
+      points: 100,
       phone: '',
       token: ''
     }

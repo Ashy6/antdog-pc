@@ -1,16 +1,125 @@
-import { Button } from 'antd';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Button, Col, InputNumber, Modal, Row, Upload, UploadFile, Image, UploadProps } from 'antd';
 import { useDispatch } from 'react-redux'
 import { updateSourceStore } from '../../../store/reducers/sourceState'
 import './style.scss'
+import { useEffect, useState } from 'react';
+import { OrderStatus } from '../../../types/order-status';
+import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import TextArea from 'antd/es/input/TextArea';
+import { formatTime } from '../../../utils/time';
+import { paidPointsOrder } from '../../../api/points';
+import { freezeUserPoints } from '../../../store/reducers/userState';
 
 export const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
     const { value, isDetails } = props
 
+    const {
+        id: orderId,
+        createTime,
+        orderNo,
+        detailList = [], // 详情
+        status,
+        points
+    } = value;
     const dispatch = useDispatch()
 
     const openDetails = () => {
         dispatch(updateSourceStore(value))
     }
+
+    const [description, setDescription] = useState('');
+
+    const [opened, setOpen] = useState(false);
+
+    const showModal = () => {
+        setOpen(true);
+    };
+
+    const [loading, setLoading] = useState(false);
+    const [orderStatus, setOrderStatus] = useState(status);
+
+    useEffect(() => {
+        setOrderStatus(status);
+    }, [status]);
+
+    const handleOk = async (e: React.MouseEvent<HTMLElement>) => {
+        setLoading(true);
+        await paidPointsOrder({
+            orderNo: orderNo,
+            images: '',
+            memo: description
+        });
+        setOrderStatus(OrderStatus.submitted);
+        dispatch(freezeUserPoints(points));
+        setOpen(false);
+        setLoading(false);
+    };
+
+    const handleCancel = (e: React.MouseEvent<HTMLElement>) => {
+        setOpen(false);
+    };
+
+    const [uploading, setUploading] = useState(false);
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList, file }) => {
+        if (file.status === 'uploading') {
+            setUploading(true);
+        } else {
+            setUploading(false);
+        }
+        setFileList(newFileList);
+    };
+
+    const modalDescriptions = [
+        { key: 1, postfix: 'odd', label: 'Order Number', value: [null, orderNo] },
+        { key: 2, postfix: 'even', label: 'Order Time', value: [null, formatTime(createTime)] },
+        {
+            key: 7,
+            postfix: 'odd',
+            isControl: true,
+            span: 3,
+            label: <>
+                <div className='desc-label'>Description</div>
+                <div className='uploader-wrapper'>
+                    {fileList.length > 0 ? <Image.PreviewGroup
+                        items={fileList}
+                    >
+                        <Image
+                            width={80}
+                            height={80}
+                            src={fileList[0]?.response?.data}
+                        />
+                    </Image.PreviewGroup>
+                        : ''}
+                    <Upload
+                        name="file"
+                        accept="image/*"
+                        listType="picture-card"
+                        className="avatar-uploader"
+                        showUploadList={false}
+                        fileList={fileList}
+                        action="/api/gcard/web/file/upload"
+                        onChange={handleChange}
+                    >
+                        <div className='upload-btn'>
+                            {uploading ? <LoadingOutlined /> : <PlusOutlined />}
+                        </div>
+                    </Upload>
+                </div>
+            </>,
+            value: [
+                <TextArea
+                    bordered={false}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Please describe the matter in detail and the platform will also question the seller.Combine all the circumstances and make a ruling."
+                    autoSize={{ minRows: 5, maxRows: 6 }}
+                />
+            ]
+        },
+    ]
 
     const componentClass = `card-item ${isDetails && 'detail-content'}`
     return (
@@ -92,39 +201,67 @@ export const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }
                 </div>
             </div>
 
+            {<Modal
+                className='negotiate-dialog'
+                title="Upload payment screenshot"
+                open={opened}
+                closeIcon={null}
+                destroyOnClose={true}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                footer={[
+                    <Button className='antdog-btn' key="cancel" onClick={handleCancel}>
+                        Cancel
+                    </Button>,
+                    <Button key="submit" className='submit-btn' loading={loading} onClick={handleOk}>
+                        Confirm
+                    </Button>
+                ]}
+            >
+                {
+                    modalDescriptions.map(item => {
+                        return <Row key={item.key} className={`ant-row-${item.postfix}`}>
+                            <Col span={10}>{item.label}</Col>
+                            {item.value.map((v) => {
+                                return <Col key={item.key + '-' + v} span={v === null ? 4 : item.isControl ? 14 : item.span === 3 ? 7 : 10}>{v}</Col>
+                            })}
+                        </Row>;
+                    })
+                }
+            </Modal>}
             {/* In trade */}
-            <div className='card-item-btn'>
-                <Button className='antdog-btn' type="primary">Cancel</Button>
-                <Button className='antdog-btn' type="primary">
+            {[OrderStatus.noSubmit, OrderStatus.normal].includes(orderStatus) && <div className='card-item-btn'>
+                <Button className='antdog-btn' type="primary" onClick={showModal}>Cancel</Button>
+                <Button className='antdog-btn' type="primary" onClick={showModal}>
                     Paid
                 </Button>
-            </div>
+            </div>}
 
             {/* In dispute */}
-            {/* <div className='card-item-btn'>
+            {orderStatus === OrderStatus.arbitration && <div className='card-item-btn'>
                 <Button className='antdog-btn disabled' type="primary" disabled>
                     Platform is in arbitration,please wait
                 </Button>
-            </div> */}
-            {/* <div className='card-item-btn short'>
+            </div>}
+            {[OrderStatus.applyNegotiate, OrderStatus.waitingArbitration].includes(orderStatus) && <div className='card-item-btn short'>
                 <Button className='antdog-btn processing' type="primary" disabled>
                     Order Processing
                 </Button>
-            </div> */}
+            </div>}
 
             {/* Cancelled */}
-            {/* <div className='card-item-btn short'>
+            {orderStatus === OrderStatus.cancel && <div className='card-item-btn short'>
                 <Button className='antdog-btn disabled' type="primary" disabled>
                     Cancelled
                 </Button>
-            </div> */}
+            </div>}
 
             {/* Completed */}
-            {/* <div className='card-item-btn short'>
+            {[OrderStatus.finish, OrderStatus.completed].includes(orderStatus) && <div className='card-item-btn short'>
                 <Button className='antdog-btn disabled' type="primary" disabled>
                     Order Completed
                 </Button>
-            </div> */}
+            </div>}
         </div>
     )
 }

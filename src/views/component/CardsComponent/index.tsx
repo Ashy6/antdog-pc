@@ -11,6 +11,7 @@ import icon from '../../../assets/png'
 import { negotiate } from '../../../api/cards'
 import { OrderStatus } from '../../../types/order-status'
 import './style.scss'
+import { formatTime } from '../../../utils/time'
 
 const { TextArea } = Input;
 
@@ -46,10 +47,13 @@ export const CardsComponent = (props: {
         'https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp',
         'https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp'
     ])
-
+    const [opened, setOpen] = useState(false);
     const [description, setDescription] = useState('');
-    const [negotiationRate, setNegotiationRate] = useState(rate);
+    const [negotiationRate, setNegotiationRate] = useState(detailList[0]?.rate);
     const [orderStatus, setOrderStatus] = useState(status || OrderStatus.noSubmit);
+    useEffect(() => {
+        setOrderStatus(status);
+    }, [status]);
     /**
      * TODO: 1 渲染图片
      * 这里假设 传入的 images 需要二次处理，用这个 effect 来监听，然后处理后 set 到 img 里
@@ -64,21 +68,6 @@ export const CardsComponent = (props: {
         dispatch(updateSourceStore(value))
     }
 
-    const formatTime = (createTime: string) => {
-        if (!createTime) return ''
-        const date = new Date(createTime)
-        const year = date.getFullYear()
-        const month = date.getMonth() + 1
-        const day = date.getDate()
-        const hours = date.getHours()
-        const minutes = date.getMinutes()
-        const formattedDate = `${year}.${month}.${day} ${hours}:${minutes}`
-        return formattedDate
-    }
-
-    const componentClass = `card-item ${isDetails && 'detail-content'}`
-    const [opened, setOpen] = useState(false);
-
     const showModal = () => {
         setOpen(true);
     };
@@ -89,11 +78,12 @@ export const CardsComponent = (props: {
         setLoading(true);
         const response = await negotiate({
             "orderNo": orderNo,
+            receiver: seller,
             "details": [
                 {
                     "id": orderId,
                     "orderNo": orderNo,
-                    "finalFaceValue": negotiationRate,
+                    "finalFaceValue": negotiationRate || detailList[0]?.rate,
                     "memo": ""
                 }
             ],
@@ -101,7 +91,7 @@ export const CardsComponent = (props: {
             "description": description
         });
         // 冻结积分数
-        dispatch(freezeUserPoints(99))
+        dispatch(freezeUserPoints(negotiationRate || detailList[0]?.rate))
 
         console.log("提交协商返回结果：", response);
         setOrderStatus(OrderStatus.applyNegotiate);
@@ -116,7 +106,12 @@ export const CardsComponent = (props: {
     const [uploading, setUploading] = useState(false);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
 
-    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
+    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList, file }) => {
+        if (file.status === 'uploading') {
+            setUploading(true);
+        } else {
+            setUploading(false);
+        }
         setFileList(newFileList);
     };
 
@@ -181,6 +176,7 @@ export const CardsComponent = (props: {
         },
     ]
 
+    const componentClass = `card-item ${isDetails && 'detail-content'}`;
     return (
         <div className={componentClass}>
             {/* amount */}
@@ -280,7 +276,6 @@ export const CardsComponent = (props: {
                     })
                 }
             </Modal>
-
             {/* In trade */}
             {orderStatus === OrderStatus.noSubmit && <div className='card-item-btn'>
                 <Button className='antdog-btn' type='primary' onClick={showModal}>
