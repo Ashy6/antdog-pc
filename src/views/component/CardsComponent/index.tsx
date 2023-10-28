@@ -8,7 +8,7 @@ import { updateSourceStore } from '../../../store/reducers/sourceState'
 import { freezeUserPoints } from '../../../store/reducers/userState'
 
 import icon from '../../../assets/png'
-import { negotiate } from '../../../api/cards'
+import { negotiate, releaseOrder } from '../../../api/cards'
 import { OrderStatus } from '../../../types/order-status'
 import './style.scss'
 import { formatTime } from '../../../utils/time'
@@ -34,6 +34,7 @@ export const CardsComponent = (props: {
         seller,      // 售卖人
         rate,        // 汇率
         cardType,
+        buyer, // 买家
         status
     } = value;
 
@@ -48,8 +49,11 @@ export const CardsComponent = (props: {
         'https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp'
     ])
     const [opened, setOpen] = useState(false);
+    const [rulingOpened, setRulingOpened] = useState(false);
     const [description, setDescription] = useState('');
+    const [rulingDescription, setRulingDescription] = useState('');
     const [negotiationRate, setNegotiationRate] = useState(detailList[0]?.rate);
+    const [rulingRate, setRulingRate] = useState(detailList[0]?.rate);
     const [orderStatus, setOrderStatus] = useState(status || OrderStatus.noSubmit);
     useEffect(() => {
         setOrderStatus(status);
@@ -70,6 +74,10 @@ export const CardsComponent = (props: {
 
     const showModal = () => {
         setOpen(true);
+    };
+
+    const showRulingModal = () => {
+        setRulingOpened(true);
     };
 
     const [loading, setLoading] = useState(false);
@@ -103,6 +111,35 @@ export const CardsComponent = (props: {
         setOpen(false);
     };
 
+    const rulingHandleOk = async (e: React.MouseEvent<HTMLElement>) => {
+        setLoading(true);
+        // const response = await negotiate({
+        //     "orderNo": orderNo,
+        //     receiver: seller,
+        //     "details": [
+        //         {
+        //             "id": orderId,
+        //             "orderNo": orderNo,
+        //             "finalFaceValue": negotiationRate || detailList[0]?.rate,
+        //             "memo": ""
+        //         }
+        //     ],
+        //     "images": fileList.map(x => x.response?.data).filter(x => Boolean(x)).join(),
+        //     "description": description
+        // });
+        // // 冻结积分数
+        // dispatch(freezeUserPoints(negotiationRate || detailList[0]?.rate))
+
+        // console.log("提交协商返回结果：", response);
+        setOrderStatus(OrderStatus.applyNegotiate);
+        setRulingOpened(false);
+        setLoading(false);
+    };
+
+    const rulingHandleCancel = (e: React.MouseEvent<HTMLElement>) => {
+        setRulingOpened(false);
+    };
+
     const [uploading, setUploading] = useState(false);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
 
@@ -118,6 +155,16 @@ export const CardsComponent = (props: {
     const negotiateRateChange = (value: number) => {
         setNegotiationRate(value);
     };
+
+    const rulingRateChange = (value: number) => {
+        setRulingRate(value);
+    }
+
+    const submitReleaseOrder = async () => {
+        const response = await releaseOrder(orderNo);
+        console.log(response);
+        setOrderStatus(OrderStatus.completed);
+    }
 
     const modalDescriptions = [
         { key: 1, postfix: 'odd', label: 'Order Number', value: [null, orderNo] },
@@ -175,6 +222,33 @@ export const CardsComponent = (props: {
             ]
         },
     ]
+
+    const rulingModalData = [
+        { key: 1, postfix: 'odd', label: 'Order Number', value: [null, orderNo] },
+        { key: 2, postfix: 'even', label: 'Order Time', value: [null, formatTime(createTime)] },
+        { key: 3, postfix: 'odd', label: 'Seller', value: [null, seller] },
+        { key: 4, postfix: 'even', label: 'Buyer', value: [null, buyer] },
+        { key: 5, postfix: 'odd', label: 'Order Amount', span: 3, value: [amount, `USD`] },
+        { key: 6, postfix: 'even', label: 'Ruling', span: 3, value: [<InputNumber min={0} max={detailList[0]?.rate} value={rulingRate} defaultValue={detailList[0]?.rate} onChange={rulingRateChange} />, 'Points'] },
+        {
+            key: 7,
+            postfix: 'odd',
+            isControl: true,
+            span: 3,
+            label: <>
+                <div className='desc-label'>Conclusion</div>
+            </>,
+            value: [
+                <TextArea
+                    bordered={false}
+                    value={rulingDescription}
+                    onChange={(e) => setRulingDescription(e.target.value)}
+                    placeholder="Please combine all the circumstances and enter the platform’s ruling conclusion."
+                    autoSize={{ minRows: 5, maxRows: 6 }}
+                />
+            ]
+        }
+    ];
 
     const componentClass = `card-item ${isDetails && 'detail-content'}`;
     return (
@@ -250,6 +324,34 @@ export const CardsComponent = (props: {
 
             <Modal
                 className='negotiate-dialog'
+                title="Ruling"
+                open={rulingOpened}
+                closeIcon={null}
+                destroyOnClose={true}
+                onOk={rulingHandleOk}
+                onCancel={rulingHandleCancel}
+                footer={[
+                    <Button className='antdog-btn' key="cancel" onClick={rulingHandleCancel}>
+                        Cancel
+                    </Button>,
+                    <Button key="submit" className='submit-btn' loading={loading} onClick={rulingHandleOk}>
+                        Confirm
+                    </Button>
+                ]}
+            >
+                {
+                    rulingModalData.map(item => {
+                        return <Row key={item.key} className={`ant-row-${item.postfix}`}>
+                            <Col span={10}>{item.label}</Col>
+                            {item.value.map((v) => {
+                                return <Col key={item.key + '-' + v} span={v === null ? 4 : item.isControl ? 14 : item.span === 3 ? 7 : 10}>{v}</Col>
+                            })}
+                        </Row>;
+                    })
+                }
+            </Modal>
+            <Modal
+                className='negotiate-dialog'
                 title="Negotiate"
                 open={opened}
                 closeIcon={null}
@@ -281,7 +383,7 @@ export const CardsComponent = (props: {
                 <Button className='antdog-btn' type='primary' onClick={showModal}>
                     Negotiate
                 </Button>
-                <Button className='antdog-btn' type='primary'>
+                <Button className='antdog-btn' type='primary' onClick={submitReleaseOrder}>
                     Release
                 </Button>
             </div>}
@@ -294,18 +396,27 @@ export const CardsComponent = (props: {
             </div>}
 
             {/* wait */}
-            {/* <div className='card-item-btn'>
+            {/* {<div className='card-item-btn'>
                 <Button className='antdog-btn disabled' type="primary" disabled>
                     Platform is in arbitration,please wait
                 </Button>
-            </div> */}
+            </div>} */}
+
+            {<div className='card-item-btn'>
+                <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
+                    Seller Win
+                </Button>
+                <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
+                    Buyer Win
+                </Button>
+            </div>}
 
             {/* Completed */}
-            {/* <div className='card-item-btn short'>
+            {orderStatus === OrderStatus.completed && <div className='card-item-btn short'>
                 <Button className='antdog-btn disabled' type="primary" disabled>
                     Order Completed
                 </Button>
-            </div> */}
+            </div>}
         </div>
     )
 }
