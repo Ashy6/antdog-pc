@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 import { Button, Form, Input, message } from 'antd'
 import { SyncOutlined } from '@ant-design/icons'
+import { updateUserStore } from '../../store/reducers/userState'
+
 import { login } from '../../api/login'
 import { MANAGE_URL } from '../../route/root'
 import './style.scss'
@@ -13,6 +16,7 @@ type FieldType = {
 
 export const Login = (): JSX.Element => {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
     const [loading, setLoading] = useState(false)
 
     const onFinish = (values: { name: string; password: string }) => {
@@ -25,6 +29,10 @@ export const Login = (): JSX.Element => {
             message[code === 0 ? 'success' : 'error']({
                 content: msg
             })
+            // TODO: 存储用户信息, 后期修改为 独立接口请求
+            if (data) {
+                dispatch(updateUserStore(data))
+            }
             localStorage.setItem('AntdogToken', data?.token)
             return res.code === 0
         }).then(code => code && navigate(MANAGE_URL)).finally(() => {

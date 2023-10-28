@@ -14,6 +14,7 @@ import {
 } from '../Manage/types'
 
 import './style.scss'
+import { useSelector } from 'react-redux'
 
 const { confirm } = Modal;
 
@@ -21,7 +22,7 @@ export const Sidebar = (props: {
     menusChange: (activeSidebar: ActiveSidebar) => void
 }) => {
     const navigate = useNavigate()
-    const [balancePoints] = useState('987654321.98')
+    const userInfo = useSelector((store: { userInfo: AnyObject }) => store.userInfo.value)
 
     const [activeMenu, setActiveMenu] = useState(MENUS[0].key)
     const [activeSubMenu, setActiveSubMenu] = useState<
@@ -63,9 +64,9 @@ export const Sidebar = (props: {
         <div className='sidebar'>
             <div className='sidebar-header'>
                 <div className='header-box'>
-                    <div>Team-hhhh</div>
-                    <div>KKKKKK</div>
-                    <div className='balance'>{balancePoints} Points</div>
+                    <div>{userInfo.merchName}</div>
+                    <div>{userInfo.merchNo}</div>
+                    <div className='balance'>{userInfo.points} Points</div>
                 </div>
             </div>
             {MENUS.map(menu => (

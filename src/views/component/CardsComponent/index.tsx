@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { ChangeEventHandler, useEffect, useState } from 'react'
 import { Button, Image, Modal, Row, Col, Upload, Input, InputNumber } from 'antd'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { updateSourceStore } from '../../../store/reducers/sourceState'
 
 import icon from '../../../assets/png'
@@ -35,6 +35,7 @@ export const CardsComponent = (props: {
         status
     } = value;
 
+    const userInfo = useSelector((store: { userInfo: AnyObject }) => store.userInfo.value)
     const dispatch = useDispatch()
 
     const [img, setImg] = useState([
