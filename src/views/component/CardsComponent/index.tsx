@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { ChangeEventHandler, useEffect, useState } from 'react'
 import { Button, Image, Modal, Row, Col, Upload, Input, InputNumber } from 'antd'
-import { useDispatch, useSelector } from 'react-redux'
-import { updateSourceStore } from '../../../store/reducers/sourceState'
-
-import icon from '../../../assets/png'
-import './style.scss'
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
+import { useDispatch, useSelector } from 'react-redux'
+import { updateSourceStore } from '../../../store/reducers/sourceState'
+import { freezeUserPoints } from '../../../store/reducers/userState'
+
+import icon from '../../../assets/png'
 import { negotiate } from '../../../api/cards'
 import { OrderStatus } from '../../../types/order-status'
+import './style.scss'
 
 const { TextArea } = Input;
 
@@ -99,6 +100,9 @@ export const CardsComponent = (props: {
             "images": fileList.map(x => x.response?.data).filter(x => Boolean(x)).join(),
             "description": description
         });
+        // 冻结积分数
+        dispatch(freezeUserPoints(99))
+
         console.log("提交协商返回结果：", response);
         setOrderStatus(OrderStatus.applyNegotiate);
         setOpen(false);
