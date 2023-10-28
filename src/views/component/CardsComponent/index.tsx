@@ -89,16 +89,9 @@ export const CardsComponent = (props: {
     const [fileList, setFileList] = useState<UploadFile[]>([]);
 
     const handleChange: UploadProps['onChange'] = ({ fileList: newFileList, file }) => {
+        // console.log(file.status);
         setFileList(newFileList);
     };
-
-    const [imageUrl, setImageUrl] = useState<string>();
-
-    const uploadButton = (
-        <div className='upload-btn'>
-            {uploading ? <LoadingOutlined /> : <PlusOutlined />}
-        </div>
-    );
 
     const [description, setDescription] = useState('');
 
@@ -116,17 +109,32 @@ export const CardsComponent = (props: {
             span: 3,
             label: <>
                 <div className='desc-label'>Description</div>
-                <Upload
-                    name="avatar"
-                    listType="picture-card"
-                    className="avatar-uploader"
-                    showUploadList={fileList.length > 0}
-                    fileList={fileList}
-                    action="/api/gcard/web/file/upload"
-                    onChange={handleChange}
-                >
-                    {imageUrl ? <img src={imageUrl} alt="avatar" /> : uploadButton}
-                </Upload>
+                <div className='uploader-wrapper'>
+                    {fileList.length > 0 ? <Image.PreviewGroup
+                        items={fileList}
+                    >
+                        <Image
+                            width={80}
+                            height={80}
+                            src={fileList[0]?.response?.data}
+                        />
+                    </Image.PreviewGroup>
+                        : ''}
+                    <Upload
+                        name="file"
+                        accept="image/*"
+                        listType="picture-card"
+                        className="avatar-uploader"
+                        showUploadList={false}
+                        fileList={fileList}
+                        action="/api/gcard/web/file/upload"
+                        onChange={handleChange}
+                    >
+                        <div className='upload-btn'>
+                            {uploading ? <LoadingOutlined /> : <PlusOutlined />}
+                        </div>
+                    </Upload>
+                </div>
             </>,
             value: [
                 <TextArea
@@ -222,16 +230,17 @@ export const CardsComponent = (props: {
             </div>
 
             <Modal
+                className='negotiate-dialog'
                 title="Negotiate"
                 open={opened}
                 closeIcon={null}
                 onOk={handleOk}
                 onCancel={handleCancel}
                 footer={[
-                    <Button key="cancel" onClick={handleCancel}>
+                    <Button className='antdog-btn' key="cancel" onClick={handleCancel}>
                         Cancel
                     </Button>,
-                    <Button key="submit" type="primary" loading={loading} onClick={handleOk}>
+                    <Button key="submit" className='submit-btn' loading={loading} onClick={handleOk}>
                         Confirm
                     </Button>
                 ]}
@@ -239,9 +248,9 @@ export const CardsComponent = (props: {
                 {
                     modalDescriptions.map(item => {
                         return <Row key={item.key} className={`ant-row-${item.postfix}`}>
-                            <Col span={item.isControl ? 8 : 10}>{item.label}</Col>
+                            <Col span={10}>{item.label}</Col>
                             {item.value.map((v) => {
-                                return <Col key={item.key + '-' + v} span={v === null ? 4 : item.isControl ? 16 : item.span === 3 ? 7 : 10}>{v}</Col>
+                                return <Col key={item.key + '-' + v} span={v === null ? 4 : item.isControl ? 14 : item.span === 3 ? 7 : 10}>{v}</Col>
                             })}
                         </Row>;
                     })
