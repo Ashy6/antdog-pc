@@ -48,6 +48,7 @@ export interface NegotiateParams {
   orderNo?: string;
   images?: string;
   description?: string;
+  receiver?: string;
   details?: [{
     id?: number;
     orderNo?: string;
@@ -57,7 +58,7 @@ export interface NegotiateParams {
 }
 export const negotiate = (options: NegotiateParams): Promise<RequestDate> => {
   return instance({
-    url: `${VITE_CONFIG}/order/negotiate`,
+    url: `${VITE_CONFIG}/order/negotiate?receiver=${options.receiver}`,
     method: 'post',
     data: options
   })

@@ -25,7 +25,7 @@ export const getPointsOrderPage = (options: OrderPage): Promise<RequestDate> => 
  * 商家支付积分订单
  */
 export interface paidOrderParams {
-    orderNO?: string
+    orderNo?: string
     images?: string
     memo?: string
 }
