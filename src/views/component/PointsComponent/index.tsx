@@ -237,7 +237,7 @@ export const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }
                 }
             </Modal>}
             {/* In trade */}
-            {[OrderStatus.noSubmit, OrderStatus.normal].includes(orderStatus) && <div className='card-item-btn'>
+            {[OrderStatus.normal].includes(orderStatus) && <div className='card-item-btn'>
                 <Button className='antdog-btn' type="primary" onClick={cancelOrder}>Cancel</Button>
                 <Button className='antdog-btn' type="primary" onClick={showModal}>
                     Paid
