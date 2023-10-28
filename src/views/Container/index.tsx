@@ -5,6 +5,7 @@ import { Col, Pagination, Row } from 'antd'
 
 import CardsComponent from '../component/CardsComponent'
 import PointsComponent from '../component/PointsComponent'
+import EmptyComponent from '../../components/EmptyComponent'
 
 import { getPointsOrderPage } from '../../api/points'
 import { getOrderPage } from '../../api/cards'
@@ -39,13 +40,12 @@ const Container = () => {
 
     useEffect(() => {
         const params = {
-            ...selectValue.params,
             page: pagination.page,
             pageSize: pagination.pageSize
         }
         const { status, subStatus } = selectValue.params
-        status && (params.status = status)
-        subStatus && (params.subStatus = subStatus)
+        status && (params['status'] = status)
+        subStatus && (params['subStatus'] = subStatus)
 
         switch (selectValue.menuKey) {
             // 获取 Cards 数据
@@ -84,17 +84,19 @@ const Container = () => {
 
     return (
         <div className='main h-100'>
-            <div className='main-cards'>
-                <Row className='cards' gutter={[32, 16]}>
-                    {list.map((source, i) => {
-                        return (
-                            <Col className='gutter-row' key={i} span={6}>
-                                {component[selectValue.menuKey]?.(source)}
-                            </Col>
-                        )
-                    })}
-                </Row>
-            </div>
+            {
+                list?.length ? (<div className='main-cards'>
+                    <Row className='cards' gutter={[32, 16]}>
+                        {list.map((source, i) => {
+                            return (
+                                <Col className='gutter-row' key={i} span={6}>
+                                    {component[selectValue.menuKey]?.(source)}
+                                </Col>
+                            )
+                        })}
+                    </Row>
+                </div>) : <EmptyComponent />
+            }
             <div className='main-pagination'>
                 <Pagination
                     current={pagination.page}
