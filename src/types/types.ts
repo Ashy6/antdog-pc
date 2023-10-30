@@ -41,7 +41,7 @@ export interface ActiveSidebar {
 export interface SelectParamsType extends ActiveSidebar {
   params: {
     orderNo: string // 搜索过滤条件
-    status?: OrderStatus // 由 subMenu 控制
+    status?: OrderStatus[] // 由 subMenu 控制
     subStatus?: number
   }
 }
