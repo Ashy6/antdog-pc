@@ -48,7 +48,7 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
     const cancelOrder = async () => {
         // TODO: 二次弹窗
         await cancelPointsOrder(orderNo);
-        setOrderStatus(OrderStatus.cancel);
+        setOrderStatus(OrderStatus.cancelled);
     }
 
     const openDetails = () => {
@@ -62,7 +62,7 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
             images: '',
             memo: description
         });
-        setOrderStatus(OrderStatus.submitted);
+        setOrderStatus(OrderStatus.completed);
         dispatch(freezeUserPoints(points));
         setOpen(false);
         setLoading(false);
@@ -246,49 +246,52 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
                     })
                 }
             </Modal>}
-            {/* In trade */}
-            {[OrderStatus.normal].includes(orderStatus) && <div className='card-item-btn'>
-                <Button className='antdog-btn' type="primary" onClick={cancelOrder}>Cancel</Button>
-                <Button className='antdog-btn' type="primary" onClick={showModal}>
-                    Paid
-                </Button>
-            </div>}
 
-            {/* In dispute */}
-            {orderStatus === OrderStatus.arbitration && <div className='card-item-btn'>
-                <Button className='antdog-btn disabled' type="primary" disabled>
-                    Platform is in arbitration,please wait
-                </Button>
-            </div>}
-            {[OrderStatus.applyNegotiate, OrderStatus.waitingArbitration].includes(orderStatus) && <div className='card-item-btn short'>
-                <Button className='antdog-btn processing' type="primary" disabled>
-                    Order Processing
-                </Button>
-            </div>}
+            {/* btn */}
+            {
+                selectValue.isRuling ? (<div className='card-item-btn'>
+                    <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
+                        Seller Win
+                    </Button>
+                    <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
+                        Buyer Win
+                    </Button>
+                </div>) : (<>
+                    {/* In trade */}
+                    {[OrderStatus.inTrade].includes(orderStatus) && <div className='card-item-btn'>
+                        <Button className='antdog-btn' type="primary" onClick={cancelOrder}>Cancel</Button>
+                        <Button className='antdog-btn' type="primary" onClick={showModal}>
+                            Paid
+                        </Button>
+                    </div>}
 
-            {/* Cancelled */}
-            {orderStatus === OrderStatus.cancel && <div className='card-item-btn short'>
-                <Button className='antdog-btn disabled' type="primary" disabled>
-                    Cancelled
-                </Button>
-            </div>}
+                    {/* In dispute */}
+                    {orderStatus === OrderStatus.inDisputeArbitration && <div className='card-item-btn'>
+                        <Button className='antdog-btn disabled' type="primary" disabled>
+                            Platform is in arbitration,please wait
+                        </Button>
+                    </div>}
+                    {[OrderStatus.inTradeProcessing].includes(orderStatus) && <div className='card-item-btn short'>
+                        <Button className='antdog-btn processing' type="primary" disabled>
+                            Order Processing
+                        </Button>
+                    </div>}
 
-            {/* Completed */}
-            {[OrderStatus.finish, OrderStatus.completed].includes(orderStatus) && <div className='card-item-btn short'>
-                <Button className='antdog-btn disabled' type="primary" disabled>
-                    Order Completed
-                </Button>
-            </div>}
+                    {/* Cancelled */}
+                    {orderStatus === OrderStatus.cancelled && <div className='card-item-btn short'>
+                        <Button className='antdog-btn disabled' type="primary" disabled>
+                            Cancelled
+                        </Button>
+                    </div>}
 
-
-            {selectValue.isRuling && <div className='card-item-btn'>
-                <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
-                    Seller Win
-                </Button>
-                <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
-                    Buyer Win
-                </Button>
-            </div>}
+                    {/* Completed */}
+                    {[OrderStatus.completed].includes(orderStatus) && <div className='card-item-btn short'>
+                        <Button className='antdog-btn disabled' type="primary" disabled>
+                            Order Completed
+                        </Button>
+                    </div>}
+                </>)
+            }
         </div>
     )
 }

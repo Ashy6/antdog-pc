@@ -12,7 +12,7 @@ const initialState: SelectParamsType = {
   isRuling: false,
   params: {
     orderNo: '',
-    status: [],
+    status: null,
     subStatus: null
   }
 }
@@ -41,7 +41,7 @@ const selectStateSlice = createSlice({
       state.value.subMenuKey = action.payload.subMenuKey
       state.value.isRuling = action.payload.isRuling
 
-      // TODO：
+      // TODO：后期配置映射关系处理此段屎中屎
       if (action.payload.menuKey === SidebarMenuType.Cards) {
         switch (action.payload.subMenuKey) {
           case SidebarSubMenuType.InTrade: // 进行中
@@ -98,13 +98,10 @@ const selectStateSlice = createSlice({
             state.value.params.status = null
             break
         }
-      } else if (action.payload.menuKey === SidebarMenuType.Ruling) {
-        state.value = initialState
-        return
       }
-      // TODO：subStatus 暂时未用于接口参数
-      // state.value.params.subStatus = action.payload
-      // console.log('action.payload.2222', state.value)
+      if (action.payload.isRuling) {
+        state.value.params.status = [OrderStatus.inDisputeArbitration]
+      }
     }
   }
 })

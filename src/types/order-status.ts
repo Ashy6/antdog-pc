@@ -5,14 +5,12 @@ export enum OrderStatus {
     inTradeProcessing = 12,
     /* 争议状态 申请协商 */
     inDisputeNegotiate = 20,
-    /* 争议状态 仲裁 */
+    /* 争议状态 仲裁 ruling */
     inDisputeArbitration = 30,
     // waitingArbitration = 32, // 等待平台仲裁
     /* 结束状态 完成 */
     completed = 42,
     /* 结束状态 取消 */
     cancelled = 41,
-    /* ruling */
-    // finish = 30 // 已结束
 }
 
