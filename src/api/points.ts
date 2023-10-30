@@ -42,8 +42,7 @@ export const paidPointsOrder = (options: paidOrderParams): Promise<RequestDate> 
  */
 export const cancelPointsOrder = (orderNo: string): Promise<RequestDate> => {
     return instance({
-        url: `${VITE_CONFIG}/points/cancel`,
-        method: 'get',
-        data: orderNo
+        url: `${VITE_CONFIG}/points/cancel?orderNo=` + orderNo,
+        method: 'get'
     })
 }

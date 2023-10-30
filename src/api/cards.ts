@@ -23,9 +23,8 @@ export const getOrderPage = (options: OrderPage): Promise<RequestDate> => {
  */
 export const orderDetail = (orderNo: string): Promise<string> => {
   return instance({
-    url: `${VITE_CONFIG}/order/detail`,
-    method: 'get',
-    data: orderNo
+    url: `${VITE_CONFIG}/order/detail?orderNo=` + orderNo,
+    method: 'get'
   })
 }
 
@@ -34,9 +33,8 @@ export const orderDetail = (orderNo: string): Promise<string> => {
  */
 export const releaseOrder = (orderNo: string): Promise<RequestDate> => {
   return instance({
-    url: `${VITE_CONFIG}/order/release`,
-    method: 'get',
-    data: orderNo
+    url: `${VITE_CONFIG}/order/release?orderNo=` + orderNo,
+    method: 'get'
   })
 }
 
@@ -49,12 +47,13 @@ export interface NegotiateParams {
   images?: string;
   description?: string;
   receiver?: string;
-  details?: [{
-    id?: number;
-    orderNo?: string;
-    finalFaceValue?: number;
-    memo?: string;
-  }];
+  points?: number;
+  // details?: [{
+  //   id?: number;
+  //   orderNo?: string;
+  //   finalFaceValue?: number;
+  //   memo?: string;
+  // }];
 }
 export const negotiate = (options: NegotiateParams): Promise<RequestDate> => {
   return instance({

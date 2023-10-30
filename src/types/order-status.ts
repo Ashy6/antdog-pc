@@ -1,15 +1,11 @@
 export enum OrderStatus {
     // 标识不传，默认展示全部
     /* 正常状态 */
-    normal = 0, // 错误数据？用于渲染按钮
+    normal = 11, // 错误数据？用于渲染按钮
     noSubmit = 10,
     submitted = 11, // 已经提交
-    waitingSettle = 12, // 待结算
     /* 争议状态 */
-    inNegotiating = 20, // 协商中
-    applyNegotiate = 21, // 申请协商
-    agreeNegotiate = 22, // 同意协商
-    disagreeNegotiate = 23, // 不同意协商
+    applyNegotiate = 20, // 申请协商
     /* 仲裁 */
     inArbitration = 30,
     arbitration = 31,    // 仲裁中

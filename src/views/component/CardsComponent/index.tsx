@@ -25,18 +25,17 @@ const CardsComponent = (props: {
     const { value, isDetails } = props
 
     const {
-        id: orderId,
         detailList = [], // 详情
         advCode, //
         amount, // 总金额
         orderNo, // 订单编号
         currency, // 币种
         createTime, // 创建时间
-        updateTime, // 更新时间
+        //updateTime, // 更新时间
         images, // 图片，TODO：1. 如果命名不对按接口返回的字段为主
         seller,      // 售卖人
-        rate,        // 汇率
-        cardType,
+        // rate,        // 汇率
+        // cardType,
         buyer, // 买家
         status
     } = value;
@@ -57,7 +56,7 @@ const CardsComponent = (props: {
     const [rulingOpened, setRulingOpened] = useState(false);
     const [description, setDescription] = useState('');
     const [rulingDescription, setRulingDescription] = useState('');
-    const [negotiationRate, setNegotiationRate] = useState(detailList[0]?.rate);
+    const [points, setNegotiationRate] = useState(0);
     const [rulingRate, setRulingRate] = useState(detailList[0]?.rate);
     const [orderStatus, setOrderStatus] = useState(status || OrderStatus.noSubmit);
 
@@ -93,19 +92,20 @@ const CardsComponent = (props: {
         const response = await negotiate({
             "orderNo": orderNo,
             receiver: seller,
-            "details": [
-                {
-                    "id": orderId,
-                    "orderNo": orderNo,
-                    "finalFaceValue": negotiationRate || detailList[0]?.rate,
-                    "memo": ""
-                }
-            ],
+            // "details": [
+            //     {
+            //         "id": orderId,
+            //         "orderNo": orderNo,
+            //         "finalFaceValue": negotiationRate || detailList[0]?.rate,
+            //         "memo": ""
+            //     }
+            // ],
             "images": fileList.map(x => x.response?.data).filter(x => Boolean(x)).join(),
-            "description": description
+            "description": description,
+            "points": points
         });
         // 冻结积分数
-        dispatch(freezeUserPoints(negotiationRate || detailList[0]?.rate))
+        // dispatch(freezeUserPoints(negotiationRate || detailList[0]?.rate))
         setOrderStatus(OrderStatus.applyNegotiate);
         setOpen(false);
         setLoading(false);
@@ -158,6 +158,7 @@ const CardsComponent = (props: {
 
     const negotiateRateChange = (value: number) => {
         setNegotiationRate(value);
+        console.log(value)
     };
 
     const rulingRateChange = (value: number) => {
@@ -175,12 +176,15 @@ const CardsComponent = (props: {
         { key: 2, postfix: 'even', label: 'Order Time', value: [null, formatTime(createTime)] },
         { key: 3, postfix: 'odd', label: 'Seller', value: [null, seller] },
         { key: 4, postfix: 'even', label: 'Order Amount', span: 3, value: [amount, `USD`] },
-        { key: 5, postfix: 'odd', label: 'Order Rate', span: 3, value: [detailList[0]?.rate, 'Points'] },
-        {
-            key: 6, postfix: 'even', label: 'Negotiation Rate', span: 3, value: [
-                <InputNumber min={0} max={detailList[0]?.rate} value={negotiationRate} defaultValue={detailList[0]?.rate} onChange={negotiateRateChange} />, 'Points'
+        { key: 5, postfix: 'odd', label: 'Order Rate', span: 3, value: [
+                <InputNumber min={0} max={points} value={points} defaultValue={amount} onChange={negotiateRateChange} />, 'Points'
             ]
         },
+        // {
+        //     key: 6, postfix: 'even', label: 'Negotiation Rate', span: 3, value: [
+        //         <InputNumber min={0} max={detailList[0]?.rate} value={negotiationRate} defaultValue={detailList[0]?.rate} onChange={negotiateRateChange} />, 'Points'
+        //     ]
+        // },
         {
             key: 7,
             postfix: 'odd',

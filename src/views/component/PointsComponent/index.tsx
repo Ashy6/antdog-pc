@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { Button, Col, Modal, Row, Upload, UploadFile, Image, UploadProps } from 'antd';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
@@ -20,8 +20,11 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
         id: orderId,
         createTime,
         orderNo,
+        bankName,
+        bankAccount,
         detailList = [], // 详情
         status,
+        amount,
         points
     } = value;
     const dispatch = useDispatch()
@@ -162,7 +165,7 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
                         Bank Account Number
                     </span>
                     <span>
-                        1234567890
+                        {bankAccount}
                     </span>
                 </div>
                 <div className='card-item-points-info'>
@@ -170,7 +173,7 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
                         Name
                     </span>
                     <span>
-                        BADDALAJHDHAU
+                        {bankName}
                     </span>
                 </div>
                 <div className='card-item-points-info'>
@@ -178,7 +181,7 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
                         Points
                     </span>
                     <span>
-                        987654321.99
+                        {points}
                     </span>
                 </div>
                 <div className='card-item-points-info'>
@@ -186,7 +189,7 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
                         Amount
                     </span>
                     <span>
-                        987654321.99 NGN
+                        {amount}
                     </span>
                 </div>
                 <div className='card-item-points-info'>
@@ -194,7 +197,7 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
                         Order Number
                     </span>
                     <span>
-                        1234567834567890
+                        {orderNo}
                     </span>
                 </div>
                 <div className='card-item-points-info'>
@@ -202,7 +205,7 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
                         Order Time
                     </span>
                     <span>
-                        2023.9.19 23.55
+                        {createTime}
                     </span>
                 </div>
                 <div className='card-item-points-info'>
