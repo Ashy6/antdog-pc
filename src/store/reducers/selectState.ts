@@ -11,7 +11,7 @@ const initialState: SelectParamsType = {
   subMenuKey: SidebarSubMenuType.none,
   isRuling: false,
   params: {
-    orderNO: '',
+    orderNo: '',
     status: null,
     subStatus: null
   }
@@ -25,7 +25,8 @@ const selectStateSlice = createSlice({
   initialState: { value: initialState },
   reducers: {
     updateOrderNO: (state, action) => {
-      state.value.params.orderNO = action.payload
+      state.value.params.orderNo = action.payload
+      console.log(state.value.params.orderNo)
     },
     updateSelect: (
       state,

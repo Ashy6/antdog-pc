@@ -12,6 +12,7 @@ import { getOrderPage } from '../../api/cards'
 import { SelectParamsType, SidebarMenuType } from '../../types/types'
 
 import './style.scss'
+import {updateOrderNO} from "../../store/reducers/selectState.ts";
 
 const component: { [key: string]: (props: AnyObject) => JSX.Element } = {
     [SidebarMenuType.Cards]: props => <CardsComponent value={props}></CardsComponent>,
@@ -41,7 +42,8 @@ const Container = () => {
     useEffect(() => {
         const params = {
             page: pagination.page,
-            pageSize: pagination.pageSize
+            pageSize: pagination.pageSize,
+            orderNo: selectValue.params.orderNo
         }
         const { status, subStatus } = selectValue.params
         status && (params['status'] = status)

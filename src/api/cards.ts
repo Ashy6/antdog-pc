@@ -1,7 +1,7 @@
 import { RequestDate, VITE_CONFIG, instance } from './utils'
 
 export interface OrderPage {
-  orderNO?: string // 订单号
+  orderNo?: string // 订单号
   status?: number // 状态
   subStatus?: number // 子状态
   orderType?: string // 订单类型
