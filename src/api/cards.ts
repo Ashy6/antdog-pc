@@ -21,7 +21,7 @@ export const getOrderPage = (options: OrderPage): Promise<RequestDate> => {
 /**
  * 订单详情
  */
-export const orderDetail = (orderNo: string): Promise<string> => {
+export const getOrderDetails = (orderNo: string): Promise<string> => {
   return instance({
     url: `${VITE_CONFIG}/order/detail?orderNo=${orderNo}`,
     method: 'get'

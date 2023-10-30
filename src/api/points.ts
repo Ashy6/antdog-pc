@@ -20,6 +20,16 @@ export const getPointsOrderPage = (options: OrderPage): Promise<RequestDate> => 
     })
 }
 
+/**
+ * 积分详情
+ */
+export const getPointsDetails = (orderNo: string): Promise<string> => {
+  return instance({
+    url: `${VITE_CONFIG}/points/detail?orderNo=${orderNo}`,
+    method: 'get'
+  })
+}
+
 
 /**
  * 商家支付积分订单

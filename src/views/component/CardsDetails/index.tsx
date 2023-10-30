@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
 import CardsComponent from '../CardsComponent'
+import { getOrderDetails } from '../../../api/cards'
 import './style.scss'
 
 const CardsDetails = ({ source }: {
     source: {
+        orderNo: string
         detailList: AnyObject[]
     }
 }) => {
     const {
+        orderNo,
         detailList, // 详情
     } = source
 
@@ -18,7 +21,10 @@ const CardsDetails = ({ source }: {
      * 这里假设 传入的 detailList 需要二次处理
      */
     useEffect(() => {
-        console.log('cards:detailList', detailList);
+        console.log('cards:source', source);
+        getOrderDetails(orderNo).then(res => {
+            console.log('res', res);
+        })
 
         if (detailList && detailList.length) {
             const newLogLists = (detailList).map(item => item)

@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import PointsComponent from '../PointsComponent'
+import { getPointsDetails } from '../../../api/points'
 import './style.scss'
 
-const PointsDetails = ({ source }: { source: AnyObject }) => {
+const PointsDetails = ({ source }: { orderNo: string, source: AnyObject }) => {
     const {
-        detailList // 日志，TODO：2. 如果命名不对按接口返回的字段为主，我理解这里有个打印日志
+        orderNo,
+        detailList, // 详情
     } = source
 
     const [logList, setlogList] = useState(detailList || [])
@@ -15,19 +17,23 @@ const PointsDetails = ({ source }: { source: AnyObject }) => {
      */
     useEffect(() => {
         console.log('detailList', detailList);
-        
+        getPointsDetails(orderNo).then(res => {
+            console.log('res', res);
+        })
+
         if (detailList) {
             const newLogLists = (detailList || []).map(item => item)
             setlogList(newLogLists)
         }
     }, [detailList])
+
     return (
         <>
             <PointsComponent value={source} isDetails></PointsComponent>
 
             {/* 拿到 log 中的信息遍历出日志列表 */}
             {logList.map((log, i) => {
-                return <div key={i}>{}</div>
+                return <div key={i}>{ }</div>
             })}
         </>
     )
