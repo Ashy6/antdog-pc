@@ -58,7 +58,7 @@ const CardsComponent = (props: {
     const [rulingDescription, setRulingDescription] = useState('');
     const [points, setNegotiationRate] = useState(0);
     const [rulingRate, setRulingRate] = useState(detailList[0]?.rate);
-    const [orderStatus, setOrderStatus] = useState(status || OrderStatus.noSubmit);
+    const [orderStatus, setOrderStatus] = useState(status || OrderStatus.inTrade);
 
     useEffect(() => {
         setOrderStatus(status);
@@ -106,7 +106,7 @@ const CardsComponent = (props: {
         });
         // 冻结积分数
         // dispatch(freezeUserPoints(negotiationRate || detailList[0]?.rate))
-        setOrderStatus(OrderStatus.applyNegotiate);
+        setOrderStatus(OrderStatus.inDisputeNegotiate);
         setOpen(false);
         setLoading(false);
     };
@@ -135,7 +135,7 @@ const CardsComponent = (props: {
         // dispatch(freezeUserPoints(negotiationRate || detailList[0]?.rate))
 
         // console.log("提交协商返回结果：", response);
-        setOrderStatus(OrderStatus.applyNegotiate);
+        setOrderStatus(OrderStatus.inDisputeNegotiate);
         setRulingOpened(false);
         setLoading(false);
     };
@@ -176,7 +176,8 @@ const CardsComponent = (props: {
         { key: 2, postfix: 'even', label: 'Order Time', value: [null, formatTime(createTime)] },
         { key: 3, postfix: 'odd', label: 'Seller', value: [null, seller] },
         { key: 4, postfix: 'even', label: 'Order Amount', span: 3, value: [amount, `USD`] },
-        { key: 5, postfix: 'odd', label: 'Order Rate', span: 3, value: [
+        {
+            key: 5, postfix: 'odd', label: 'Order Rate', span: 3, value: [
                 <InputNumber min={0} max={points} value={points} defaultValue={amount} onChange={negotiateRateChange} />, 'Points'
             ]
         },
@@ -382,47 +383,47 @@ const CardsComponent = (props: {
                     })
                 }
             </Modal>
-
-            {/* In trade */}
-            {orderStatus === OrderStatus.noSubmit && <div className='card-item-btn'>
-                <Button className='antdog-btn' type='primary' onClick={showModal}>
-                    Negotiate
-                </Button>
-                <Button className='antdog-btn' type='primary' onClick={submitReleaseOrder}>
-                    Release
-                </Button>
-            </div>}
-
-            {/* In dispute */}
-            {orderStatus === OrderStatus.applyNegotiate && <div className='card-item-btn short'>
-                <Button className='antdog-btn disabled' type="primary" disabled>
-                    In dispute
-                </Button>
-            </div>}
-
-            {/* wait */}
-            {orderStatus === OrderStatus.waitingArbitration && <div div className='card-item-btn'>
-                <Button className='antdog-btn disabled' type="primary" disabled>
-                    Platform is in arbitration,please wait
-                </Button>
-            </div>}
-
-            {/* Completed */}
-            {orderStatus === OrderStatus.completed && <div className='card-item-btn short'>
-                <Button className='antdog-btn disabled' type="primary" disabled>
-                    Order Completed
-                </Button>
-            </div>}
-
-            {/* Ruling */}
-            {selectValue.isRuling && <div className='card-item-btn'>
+            {selectValue.isRuling ? (<div className='card-item-btn'>
                 <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
                     Seller Win
                 </Button>
                 <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
                     Buyer Win
                 </Button>
-            </div>}
+            </div>) : (<>
+                {/* In trade */}
+                {orderStatus === OrderStatus.inTrade && <div className='card-item-btn'>
+                    <Button className='antdog-btn' type='primary' onClick={showModal}>
+                        Negotiate
+                    </Button>
+                    <Button className='antdog-btn' type='primary' onClick={submitReleaseOrder}>
+                        Release
+                    </Button>
+                </div>}
+
+                {/* In dispute */}
+                {[OrderStatus.inDisputeNegotiate].includes(orderStatus) && <div className='card-item-btn short'>
+                    <Button className='antdog-btn disabled' type="primary" disabled>
+                        In dispute
+                    </Button>
+                </div>}
+
+                {/* wait */}
+                {orderStatus === OrderStatus.inDisputeArbitration && <div className='card-item-btn'>
+                    <Button className='antdog-btn disabled' type="primary" disabled>
+                        Platform is in arbitration,please wait
+                    </Button>
+                </div>}
+
+                {/* Completed */}
+                {orderStatus === OrderStatus.completed && <div className='card-item-btn short'>
+                    <Button className='antdog-btn disabled' type="primary" disabled>
+                        Order Completed
+                    </Button>
+                </div>}
+            </>
+            )}
+
         </div >
     )
 }

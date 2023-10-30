@@ -26,7 +26,6 @@ const selectStateSlice = createSlice({
   reducers: {
     updateOrderNO: (state, action) => {
       state.value.params.orderNo = action.payload
-      console.log(state.value.params.orderNo)
     },
     updateSelect: (
       state,
@@ -42,28 +41,27 @@ const selectStateSlice = createSlice({
       state.value.subMenuKey = action.payload.subMenuKey
       state.value.isRuling = action.payload.isRuling
 
-      // TODO：
+      // TODO：后期配置映射关系处理此段屎中屎
       if (action.payload.menuKey === SidebarMenuType.Cards) {
         switch (action.payload.subMenuKey) {
           case SidebarSubMenuType.InTrade: // 进行中
-            state.value.params.status = OrderStatus.noSubmit
+            state.value.params.status = [OrderStatus.inTrade]
             break
 
           case SidebarSubMenuType.InDispute: // 争议
-            // Card 属于协商  20 inNegotiating
-            // 30 inArbitration
-            // 等待平台仲裁  32 waitingArbitration
-            // 这里能查的只有申请协商  21  applyNegotiate 和 32 waitingArbitration
-            state.value.params.status = OrderStatus.applyNegotiate
+            state.value.params.status = [
+              OrderStatus.inDisputeNegotiate,
+              OrderStatus.inDisputeArbitration
+            ]
             break
 
           case SidebarSubMenuType.Completed: // 完成
             // Card 属于完成 40
-            state.value.params.status = OrderStatus.completed
+            state.value.params.status = [OrderStatus.completed]
             break
 
           case SidebarSubMenuType.Cancelled: // 取消 41
-            state.value.params.status = OrderStatus.cancel
+            state.value.params.status = [OrderStatus.cancelled]
             break
 
           default: // 未选择任何  SidebarSubMenuType.none
@@ -74,34 +72,36 @@ const selectStateSlice = createSlice({
         // 更新 Points status
         switch (action.payload.subMenuKey) {
           case SidebarSubMenuType.InTrade: // 进行中
-            state.value.params.status = OrderStatus.normal
+            state.value.params.status = [
+              OrderStatus.inTrade,
+              OrderStatus.inTradeProcessing
+            ]
             break
 
           case SidebarSubMenuType.InDispute: // 争议
-            // Points 属于协商
-            state.value.params.status = OrderStatus.inArbitration
+            state.value.params.status = [
+              OrderStatus.inDisputeNegotiate,
+              OrderStatus.inDisputeArbitration
+            ]
             break
 
           case SidebarSubMenuType.Completed: // 完成
             // Points 属于已结束 42
-            state.value.params.status = OrderStatus.finish
+            state.value.params.status = [OrderStatus.completed]
             break
 
           case SidebarSubMenuType.Cancelled: // 取消 41
-            state.value.params.status = OrderStatus.cancel
+            state.value.params.status = [OrderStatus.cancelled]
             break
 
           default: // 未选择任何  SidebarSubMenuType.none
             state.value.params.status = null
             break
         }
-      } else if (action.payload.menuKey === SidebarMenuType.Ruling) {
-        state.value = initialState
-        return
       }
-      // TODO：subStatus 暂时未用于接口参数
-      // state.value.params.subStatus = action.payload
-      // console.log('action.payload.2222', state.value)
+      if (action.payload.isRuling) {
+        state.value.params.status = [OrderStatus.inDisputeArbitration]
+      }
     }
   }
 })

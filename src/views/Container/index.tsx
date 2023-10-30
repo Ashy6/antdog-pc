@@ -12,7 +12,6 @@ import { getOrderPage } from '../../api/cards'
 import { SelectParamsType, SidebarMenuType } from '../../types/types'
 
 import './style.scss'
-import {updateOrderNO} from "../../store/reducers/selectState.ts";
 
 const component: { [key: string]: (props: AnyObject) => JSX.Element } = {
     [SidebarMenuType.Cards]: props => <CardsComponent value={props}></CardsComponent>,
@@ -27,17 +26,7 @@ const Container = () => {
         pageSize: 8,
         total: 0
     })
-    const [list, setList] = useState<AnyObject[]>([
-        { type: 1 },
-        { type: 2 },
-        { type: 3 },
-        { type: 4 },
-        { type: 5 },
-        { type: 6 },
-        { type: 7 },
-        { type: 8 },
-        { type: 9 }
-    ])
+    const [list, setList] = useState<AnyObject[]>([])
 
     useEffect(() => {
         const params = {
@@ -46,13 +35,10 @@ const Container = () => {
             orderNo: selectValue.params.orderNo
         }
         const { status, subStatus } = selectValue.params
-        status && (params['status'] = status)
+        status && status.length && (params['status'] = status)
         subStatus && (params['subStatus'] = subStatus)
 
         switch (selectValue.menuKey) {
-            // TODO：获取 Ruling 接口
-            case SidebarMenuType.Ruling:
-                return
             // 获取 Cards 数据
             case SidebarMenuType.Cards:
                 getOrderPage(params).then(res => {
