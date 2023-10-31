@@ -48,11 +48,13 @@ const CardsDetails = (source: AnyObject) => {
                             <br />
                             <span>{desc}</span>
                             <br />
-                            <Image.PreviewGroup>
-                                {imageList.map(url => (
-                                    <Image width={80} height={120} src={url} />
-                                ))}
-                            </Image.PreviewGroup>
+                            <div className='images'>
+                                {imageList?.length && <Image.PreviewGroup>
+                                    {imageList.map(url => (
+                                        <Image width={80} height={120} src={url} />
+                                    ))}
+                                </Image.PreviewGroup>}
+                            </div>
                         </div>
                     </div>
                 )

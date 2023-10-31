@@ -8,6 +8,7 @@
     height: 100%;
     overflow: auto;
     padding: 20px 30px;
+    min-width: 1600px;
 
     .detail-content {
         /* 防止内容被分割到不同的列中 */
@@ -49,6 +50,23 @@
                     margin-top: 0;
                     /* 移除首行的上外边距 */
                     text-indent: 2em;
+                }
+            }
+
+            .images {
+                margin-top: 16px;
+                display: flex;
+                justify-content: space-between;
+                align-content: center;
+
+                .ant-image {
+                    flex: 1;
+                    border-radius: 8px;
+                    overflow: hidden;
+
+                    &:not(:first-child) {
+                        margin-left: 7%;
+                    }
                 }
             }
         }
