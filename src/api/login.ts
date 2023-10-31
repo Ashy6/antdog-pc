@@ -12,3 +12,15 @@ export const login = (options: LoginParams): Promise<RequestDate> => {
     data: options
   })
 }
+
+/**
+ * 商户信息积分接口
+ * @param options 
+ * @returns 
+ */
+export const getSelectBalance = (): Promise<RequestDate> => {
+  return instance({
+    url: `${VITE_CONFIG}/selectBalance`,
+    method: 'get',
+  })
+}
