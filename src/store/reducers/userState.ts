@@ -8,22 +8,20 @@ const userStateSlice = createSlice({
   name: 'userStore',
   initialState: {
     value: {
-      mail: '',
-      merchName: '',
-      merchNo: '',
-      points: 100,
-      phone: '',
-      token: ''
+      tenantId: '',
+      walletNo: '',
+      balance: 0,
     }
   },
   reducers: {
+    // 更新积分 store
     updateUserStore: (state, action) => {
       state.value = { ...state.value, ...action.payload }
     },
     // 处理冻结积分逻辑
     freezeUserPoints: (state, action) => {
-      if (state.value.points > 0 && state.value.points - action.payload > 0) {
-        state.value.points -= action.payload
+      if (state.value.balance > 0 && state.value.balance - action.payload > 0) {
+        state.value.balance -= action.payload
       } else {
         message.warning({ content: 'Insufficient points balance.' })
       }

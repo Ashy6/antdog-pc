@@ -6,11 +6,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Button, Modal } from 'antd'
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons'
 
+import { getSelectBalance } from '../../api/login'
+import { SidebarMenuType, SidebarSubMenuType } from '../../types/types'
 import { clearSourceStore } from '../../store/reducers/sourceState'
 import { updateSelect } from '../../store/reducers/selectState'
+import { updateUserStore } from '../../store/reducers/userState'
 import { LOGIN_URL } from '../../route/root'
 import { MENUS } from '../Manage/data'
-import { SidebarMenuType, SidebarSubMenuType } from '../../types/types'
 
 import './style.scss'
 
@@ -27,6 +29,15 @@ const Sidebar = () => {
     const [activeSubMenu, setActiveSubMenu] = useState<
         SidebarMenuType | SidebarSubMenuType
     >(SidebarSubMenuType.none)
+
+    useEffect(() => {
+        getSelectBalance().then(res => {
+            const { data } = res
+            if (data) {
+                dispatch(updateUserStore(data))
+            }
+        })
+    }, [])
 
     useEffect(() => {
         const menuKey =
@@ -77,9 +88,9 @@ const Sidebar = () => {
         <div className='sidebar'>
             <div className='sidebar-header'>
                 <div className='header-box'>
-                    <div>{userInfo.merchName}</div>
-                    <div>{userInfo.merchNo}</div>
-                    <div className='balance'>{userInfo.points} Points</div>
+                    <div>{userInfo.tenantId}</div>
+                    <div>{userInfo.walletNo}</div>
+                    <div className='balance'>{userInfo.balance} Points</div>
                 </div>
             </div>
             {MENUS.map(menu => (
