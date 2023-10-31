@@ -4,7 +4,7 @@ import CardsComponent from '../CardsComponent'
 import { getOrderDetails } from '../../../api/cards'
 import { convertTimeString, getImageList } from '../../../utils/fun'
 
-const CardsDetails = ({ source }: { source: { orderNo: string } }) => {
+const CardsDetails = (source: AnyObject) => {
     const { orderNo } = source
 
     const [logList, setlogList] = useState([])
