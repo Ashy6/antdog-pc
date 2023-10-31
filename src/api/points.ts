@@ -25,8 +25,9 @@ export const getPointsOrderPage = (options: OrderPage): Promise<RequestDate> => 
  */
 export const getPointsDetails = (orderNo: string): Promise<string> => {
   return instance({
-    url: `${VITE_CONFIG}/points/detail?orderNo=${orderNo}`,
-    method: 'get'
+    url: `${VITE_CONFIG}/points/detail`,
+    method: 'get',
+    params: { orderNo }
   })
 }
 
