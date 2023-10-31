@@ -1,39 +1,61 @@
 import { useEffect, useState } from 'react'
-import PointsComponent from '../PointsComponent'
+import { Image } from 'antd'
 import { getPointsDetails } from '../../../api/points'
-import './style.scss'
+import PointsComponent from '../PointsComponent'
+import { convertTimeString, getImageList } from '../../../utils/fun'
 
-const PointsDetails = ({ source }: { orderNo: string, source: AnyObject }) => {
-    const {
-        orderNo,
-        detailList, // 详情
-    } = source
+const PointsDetails = ({ source }: { orderNo: string; source: AnyObject }) => {
+    const { orderNo } = source
 
-    const [logList, setlogList] = useState(detailList || [])
+    const [logList, setlogList] = useState([])
 
-    /**
-     * TODO: 2 详情页中的日志
-     * 这里假设 传入的 logs 需要二次处理
-     */
     useEffect(() => {
-        console.log('detailList', detailList);
-        getPointsDetails(orderNo).then(res => {
-            console.log('res', res);
+        setlogList([])
+        getPointsDetails(orderNo).then((res: any) => {
+            setlogList(
+                (res?.data?.statusRecordList || []).map(
+                    ({ afterStatusDesc, createTime, memo, images }) => {
+                        const { date, time } = convertTimeString(createTime)
+                        return {
+                            label: afterStatusDesc,
+                            date,
+                            time,
+                            desc: memo,
+                            imageList: getImageList(images || '')
+                        }
+                    }
+                )
+            )
         })
-
-        if (detailList) {
-            const newLogLists = (detailList || []).map(item => item)
-            setlogList(newLogLists)
-        }
-    }, [detailList])
+    }, [orderNo])
 
     return (
         <>
             <PointsComponent value={source} isDetails></PointsComponent>
 
-            {/* 拿到 log 中的信息遍历出日志列表 */}
-            {logList.map((log, i) => {
-                return <div key={i}>{ }</div>
+            {logList.map(({ label, date, time, desc, imageList }, i) => {
+                return (
+                    <div key={i} className='detail-content'>
+                        <div className='detail-info'>
+                            <div className='label'>{label}</div>
+                            <div>
+                                <p>{date}</p>
+                                <p>{time}</p>
+                            </div>
+                        </div>
+                        <div className='detail-desc'>
+                            <label htmlFor=''>Description：</label>
+                            <br />
+                            <span>{desc}</span>
+                            <br />
+                            <Image.PreviewGroup>
+                                {imageList.map(url => (
+                                    <Image width={80} height={120} src={url} />
+                                ))}
+                            </Image.PreviewGroup>
+                        </div>
+                    </div>
+                )
             })}
         </>
     )

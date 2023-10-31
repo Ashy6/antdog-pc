@@ -3,13 +3,54 @@
     column-count: 3;
     /* 列之间的间距 */
     column-gap: 30px;
+    /* 自动填充每一列 */
+    column-fill: auto;
     height: 100%;
     overflow: auto;
-    padding: 30px 40px 40px;
+    padding: 20px 30px;
 
     .detail-content {
         /* 防止内容被分割到不同的列中 */
         break-inside: avoid-column;
+        /* 避免元素跨页分割 */
+        page-break-inside: avoid;
         margin-bottom: 20px;
+        max-width: 30vw;
+
+        .detail-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            .label {
+                font-weight: 700;
+                text-align: initial;
+            }
+
+            p {
+                line-height: 20px;
+                text-align: right;
+                margin: 0 0 0 16px;
+
+                &:first-child {
+                    width: max-content;
+                }
+
+                /* 设置段落的首行缩进为 2em */
+            }
+        }
+
+        .detail-desc {
+            width: 100%;
+            text-align: justify;
+
+            span {
+                &::first-line {
+                    margin-top: 0;
+                    /* 移除首行的上外边距 */
+                    text-indent: 2em;
+                }
+            }
+        }
     }
 }
