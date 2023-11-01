@@ -28,12 +28,18 @@ const Container = () => {
             store.selectInfo.value
     )
 
-    const [pagination, setPagination] = useState({
+    const initPagination = {
         page: 1,
         pageSize: 8,
         total: 0
-    })
+    }
+
+    const [pagination, setPagination] = useState(initPagination)
     const [list, setList] = useState<AnyObject[]>([])
+
+    useEffect(() => {
+        setPagination(initPagination)
+    }, [selectValue.menuKey]);
 
     useEffect(() => {
         const params = {
