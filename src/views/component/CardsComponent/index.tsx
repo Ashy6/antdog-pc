@@ -5,7 +5,7 @@ import { Button, Image, Modal, Row, Col, Upload, Input, InputNumber } from 'antd
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 import { updateSourceStore } from '../../../store/reducers/sourceState'
-import { freezeUserPoints } from '../../../store/reducers/userState'
+import { syncUserInfo } from '../../../store/reducers/userState'
 
 import { judgmentOrder, negotiate, releaseOrder } from '../../../api/cards'
 import { OrderStatus } from '../../../types/order-status'
@@ -86,8 +86,9 @@ const CardsComponent = (props: {
         setOpen(true);
     };
 
-    const showRulingModal = () => {
+    const showRulingModal = (winner: 'seller' | 'buyer') => {
         setRulingOpened(true);
+        setWinner(winner);
     };
 
     const handleOk = async (e: React.MouseEvent<HTMLElement>) => {
@@ -108,17 +109,20 @@ const CardsComponent = (props: {
             "points": points
         });
         // 冻结积分数
-        // dispatch(freezeUserPoints(negotiationRate || detailList[0]?.rate))
-        setOrderStatus(OrderStatus.inDisputeNegotiate);
-        setOpen(false);
-        setLoading(false);
+        if (response.code === 0) {
+            setOrderStatus(OrderStatus.inDisputeNegotiate);
+            dispatch(syncUserInfo());
+            setOpen(false);
+            setLoading(false);
+        }
     };
 
     const handleCancel = (e: React.MouseEvent<HTMLElement>) => {
         setOpen(false);
     };
 
-    const rulingHandleOk = async (e: React.MouseEvent<HTMLElement>, winner: 'buyer' | 'seller') => {
+    const [winner, setWinner] = useState(null);
+    const rulingHandleOk = async (e: React.MouseEvent<HTMLElement>) => {
         setLoading(true);
         const response = await judgmentOrder({
             orderNo: orderNo,
@@ -128,14 +132,13 @@ const CardsComponent = (props: {
             images: fileList.map(x => x.response?.data).filter(x => Boolean(x)).join(),
             description: rulingDescription
         });
-        console.log(response, 3456);
         // // 冻结积分数
-        // dispatch(freezeUserPoints(negotiationRate || detailList[0]?.rate))
-
-        // console.log("提交协商返回结果：", response);
-        setOrderStatus(OrderStatus.inDisputeNegotiate);
-        setRulingOpened(false);
-        setLoading(false);
+        if (response.code === 0) {
+            dispatch(syncUserInfo());
+            setOrderStatus(OrderStatus.inDisputeNegotiate);
+            setRulingOpened(false);
+            setLoading(false);
+        }
     };
 
     const rulingHandleCancel = (e: React.MouseEvent<HTMLElement>) => {
@@ -165,8 +168,10 @@ const CardsComponent = (props: {
 
     const submitReleaseOrder = async () => {
         const response = await releaseOrder(orderNo);
-        console.log(response);
-        setOrderStatus(OrderStatus.completed);
+        if (response.code === 0) {
+            setOrderStatus(OrderStatus.completed);
+            dispatch(syncUserInfo());
+        }
     }
 
     const modalDescriptions = [
@@ -326,10 +331,10 @@ const CardsComponent = (props: {
             </div>
 
             {selectValue.isRuling ? (<div className='card-item-btn'>
-                <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
+                <Button className='antdog-btn' type="primary" onClick={() => showRulingModal('seller')}>
                     Seller Win
                 </Button>
-                <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
+                <Button className='antdog-btn' type="primary" onClick={() => showRulingModal('buyer')}>
                     Buyer Win
                 </Button>
             </div>) : (<>
@@ -377,7 +382,7 @@ const CardsComponent = (props: {
                     <Button className='antdog-btn' key="cancel" onClick={rulingHandleCancel}>
                         Cancel
                     </Button>,
-                    <Button key="submit" className='submit-btn' loading={loading} onClick={e=> rulingHandleOk}>
+                    <Button key="submit" className='submit-btn' loading={loading} onClick={e => rulingHandleOk(e)}>
                         Confirm
                     </Button>
                 ]}

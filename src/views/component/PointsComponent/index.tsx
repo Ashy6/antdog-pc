@@ -5,9 +5,9 @@ import { Button, Col, Modal, Row, Upload, UploadFile, Image, UploadProps, InputN
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import TextArea from 'antd/es/input/TextArea';
 
-import { cancelPointsOrder, paidPointsOrder } from '../../../api/points';
+import { cancelPointsOrder, judgmentPoints, paidPointsOrder } from '../../../api/points';
 import { updateSourceStore } from '../../../store/reducers/sourceState'
-import { freezeUserPoints } from '../../../store/reducers/userState';
+import { syncUserInfo } from '../../../store/reducers/userState';
 import { OrderStatus } from '../../../types/order-status';
 import { formatTime } from '../../../utils/time';
 import { SelectParamsType } from '../../../types/types';
@@ -29,7 +29,9 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
         buyer,
         point,
         points,
-        rate
+        rate,
+        userId,
+        merchNo
     } = value;
     const dispatch = useDispatch()
 
@@ -75,7 +77,7 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
             memo: description
         });
         setOrderStatus(OrderStatus.inTradeProcessing);
-        dispatch(freezeUserPoints(point));
+        dispatch(syncUserInfo());
         setOpen(false);
         setLoading(false);
     };
@@ -88,29 +90,24 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
         setRulingPoint(value);
     }
 
+    const [winner, setWinner] = useState(null);
+
     const rulingHandleOk = async (e: React.MouseEvent<HTMLElement>) => {
         setLoading(true);
-        // const response = await negotiate({
-        //     "orderNo": orderNo,
-        //     receiver: seller,
-        //     "details": [
-        //         {
-        //             "id": orderId,
-        //             "orderNo": orderNo,
-        //             "finalFaceValue": negotiationRate || detailList[0]?.rate,
-        //             "memo": ""
-        //         }
-        //     ],
-        //     "images": fileList.map(x => x.response?.data).filter(x => Boolean(x)).join(),
-        //     "description": description
-        // });
-        // // 冻结积分数
-        // dispatch(freezeUserPoints(negotiationRate || detailList[0]?.rate))
 
-        // console.log("提交协商返回结果：", response);
-        setOrderStatus(OrderStatus.inDisputeNegotiate);
-        setRulingOpened(false);
-        setLoading(false);
+        const response = await judgmentPoints({
+            orderNo: orderNo,
+            winner: winner === 'buyer' ? userId : merchNo,
+            loser: winner === 'buyer' ? merchNo : userId,
+            description: rulingDescription,
+            points: points,
+            images: fileList.map(x => x.response?.data).filter(x => Boolean(x)).join(),
+        });
+        if (response.code === 0) {
+            setOrderStatus(OrderStatus.inDisputeNegotiate);
+            setRulingOpened(false);
+            setLoading(false);
+        }
     };
 
     const rulingHandleCancel = (e: React.MouseEvent<HTMLElement>) => {

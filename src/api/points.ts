@@ -24,11 +24,11 @@ export const getPointsOrderPage = (options: OrderPage): Promise<RequestDate> => 
  * 积分详情
  */
 export const getPointsDetails = (orderNo: string): Promise<string> => {
-  return instance({
-    url: `${VITE_CONFIG}/points/detail`,
-    method: 'get',
-    params: { orderNo }
-  })
+    return instance({
+        url: `${VITE_CONFIG}/points/detail`,
+        method: 'get',
+        params: { orderNo }
+    })
 }
 
 
@@ -56,4 +56,19 @@ export const cancelPointsOrder = (orderNo: string): Promise<RequestDate> => {
         url: `${VITE_CONFIG}/points/cancel?orderNo=` + orderNo,
         method: 'get'
     })
+}
+
+export const judgmentPoints = (data: {
+    orderNo: string;
+    winner: string;
+    loser: string
+    images: string;
+    description: string,
+    points: number
+}): Promise<RequestDate> => {
+    return instance({
+        url: `${VITE_CONFIG}/points/judgment`,
+        method: 'post',
+        data: data
+    });
 }

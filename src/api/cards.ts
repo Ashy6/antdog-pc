@@ -52,7 +52,7 @@ export const judgmentOrder = (data: {
   images?: string,
   description?: string,
   points: number
-}) => {
+}): Promise<RequestDate> => {
   return instance({
     url: `${VITE_CONFIG}/order/judgment`,
     method: 'post',
