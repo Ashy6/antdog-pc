@@ -14,12 +14,19 @@ import { SelectParamsType, SidebarMenuType } from '../../types/types'
 import './style.scss'
 
 const component: { [key: string]: (props: AnyObject) => JSX.Element } = {
-    [SidebarMenuType.Cards]: props => <CardsComponent value={props}></CardsComponent>,
-    [SidebarMenuType.Points]: props => <PointsComponent value={props}></PointsComponent>
+    [SidebarMenuType.Cards]: props => (
+        <CardsComponent value={props}></CardsComponent>
+    ),
+    [SidebarMenuType.Points]: props => (
+        <PointsComponent value={props}></PointsComponent>
+    )
 }
 
 const Container = () => {
-    const selectValue = useSelector((store: { selectInfo: { value: SelectParamsType } }) => store.selectInfo.value)
+    const selectValue = useSelector(
+        (store: { selectInfo: { value: SelectParamsType } }) =>
+            store.selectInfo.value
+    )
 
     const [pagination, setPagination] = useState({
         page: 1,
@@ -55,7 +62,7 @@ const Container = () => {
             const { records, total } = res.data
             setPagination(value => ({
                 ...value,
-                total,
+                total
             }))
             setList(records as AnyObject[])
         }
@@ -70,19 +77,25 @@ const Container = () => {
 
     return (
         <div className='container h-100'>
-            {
-                list?.length ? (<div className='container-cards'>
+            {list?.length ? (
+                <div className='container-cards'>
                     <Row className='cards' gutter={[32, 16]}>
                         {list.map((source, i) => {
                             return (
-                                <Col className='gutter-row' key={i} span={6}>
+                                <Col
+                                    className='gutter-row'
+                                    key={`${selectValue.menuKey}-${i}`}
+                                    span={6}
+                                >
                                     {component[selectValue.menuKey]?.(source)}
                                 </Col>
                             )
                         })}
                     </Row>
-                </div>) : <EmptyComponent />
-            }
+                </div>
+            ) : (
+                <EmptyComponent />
+            )}
             <div className='container-pagination'>
                 <Pagination
                     current={pagination.page}

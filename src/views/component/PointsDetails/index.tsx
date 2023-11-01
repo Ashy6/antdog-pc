@@ -52,8 +52,8 @@ const PointsDetails = (props: AnyObject) => {
                             <div className='images'>
                                 {imageList?.length && (
                                     <Image.PreviewGroup>
-                                        {imageList.map(url => (
-                                            <Image width={110} height={140} src={url} />
+                                        {imageList.map((url, i) => (
+                                            <Image key={i} width={110} height={140} src={url} />
                                         ))}
                                         {/* 不满足三个展示空占位 */}
                                         {imageList.length < 3 &&

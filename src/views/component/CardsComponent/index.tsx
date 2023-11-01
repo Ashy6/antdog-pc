@@ -65,8 +65,7 @@ const CardsComponent = (props: {
             imgArr: it.images.split(',') || []
         }))
         setImageList(imgDetailList)
-        // TODO: 如果更新卡片后图片渲染出问题可以考虑监听 [detailList]
-    }, [])
+    }, [detailList])
 
     const openDetails = () => {
         dispatch(updateSourceStore(value))
@@ -292,14 +291,14 @@ const CardsComponent = (props: {
             {
                 imageList.map((info, index) => {
                     const { imgArr } = info
-                    return (isDetails || index === 0) ? (<div className={detailClass}>
+                    return (isDetails || index === 0) ? (<div className={detailClass} key={`IMG-${index}`}>
                         {/* images */}
                         <div className='card-item-images' >
                             <Image.PreviewGroup>
                                 {/* TODO: 这里的样式渲染有问题，考虑每三个一组独立渲染
                                 每一组加 detail-content 类名保证不换行展示*/}
                                 {imgArr.map((url, i) => (
-                                    <Image key={i} width={100} height={120} src={url} />
+                                    <Image key={`image-${i}`} width={100} height={120} src={url} />
                                 ))}
                                 {/* 不满足三个展示空占位 */}
                                 {imgArr.length < 3 &&
