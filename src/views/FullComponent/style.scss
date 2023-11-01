@@ -2,7 +2,7 @@
     /* 将内容分成三列 */
     column-count: 3;
     /* 列之间的间距 */
-    column-gap: 30px;
+    column-gap: 60px;
     /* 自动填充每一列 */
     column-fill: auto;
     height: 100%;
@@ -16,7 +16,6 @@
         /* 避免元素跨页分割 */
         page-break-inside: avoid;
         margin-bottom: 20px;
-        max-width: 30vw;
 
         .detail-info {
             display: flex;
@@ -70,5 +69,12 @@
                 }
             }
         }
+    }
+
+    .card-item {
+        min-width: 360px;
+        width: 410px;
+        max-width: 420px;
+        margin: 0 auto; 
     }
 }
