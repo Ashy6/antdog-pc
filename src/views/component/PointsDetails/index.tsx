@@ -4,7 +4,8 @@ import { getPointsDetails } from '../../../api/points'
 import PointsComponent from '../PointsComponent'
 import { convertTimeString, getImageList } from '../../../utils/fun'
 
-const PointsDetails = (source: AnyObject) => {
+const PointsDetails = (props: AnyObject) => {
+    const { source } = props
     const { orderNo } = source
 
     const [logList, setlogList] = useState([])
@@ -48,11 +49,24 @@ const PointsDetails = (source: AnyObject) => {
                             <br />
                             <span>{desc}</span>
                             <br />
-                            <Image.PreviewGroup>
-                                {imageList.map(url => (
-                                    <Image width={80} height={120} src={url} />
-                                ))}
-                            </Image.PreviewGroup>
+                            <div className='images'>
+                                {imageList?.length && (
+                                    <Image.PreviewGroup>
+                                        {imageList.map(url => (
+                                            <Image width={110} height={140} src={url} />
+                                        ))}
+                                        {/* 不满足三个展示空占位 */}
+                                        {imageList.length < 3 &&
+                                            Array.from({ length: 3 - imageList.length }, (_, i) => (
+                                                <div
+                                                    className='ant-image'
+                                                    key={`empty-${i}`}
+                                                    style={{ width: 110, height: 140 }}
+                                                ></div>
+                                            ))}
+                                    </Image.PreviewGroup>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )

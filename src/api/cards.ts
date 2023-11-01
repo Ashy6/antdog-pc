@@ -34,9 +34,8 @@ export const getOrderDetails = (orderNo: string): Promise<string> => {
  */
 export const releaseOrder = (orderNo: string): Promise<RequestDate> => {
   return instance({
-    url: `${VITE_CONFIG}/order/release`,
-    method: 'get',
-    params: { orderNo }
+    url: `${VITE_CONFIG}/order/release?orderNo=${orderNo}`,
+    method: 'get'
   })
 }
 

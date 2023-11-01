@@ -4,7 +4,8 @@ import CardsComponent from '../CardsComponent'
 import { getOrderDetails } from '../../../api/cards'
 import { convertTimeString, getImageList } from '../../../utils/fun'
 
-const CardsDetails = (source: AnyObject) => {
+const CardsDetails = (props: AnyObject) => {
+    const { source } = props
     const { orderNo } = source
 
     const [logList, setlogList] = useState([])
@@ -49,11 +50,22 @@ const CardsDetails = (source: AnyObject) => {
                             <span>{desc}</span>
                             <br />
                             <div className='images'>
-                                {imageList?.length && <Image.PreviewGroup>
-                                    {imageList.map(url => (
-                                        <Image width={80} height={120} src={url} />
-                                    ))}
-                                </Image.PreviewGroup>}
+                                {imageList?.length && (
+                                    <Image.PreviewGroup>
+                                        {imageList.map(url => (
+                                            <Image width={110} height={140} src={url} />
+                                        ))}
+                                        {/* 不满足三个展示空占位 */}
+                                        {imageList.length < 3 &&
+                                            Array.from({ length: 3 - imageList.length }, (_, i) => (
+                                                <div
+                                                    className='ant-image'
+                                                    key={`empty-${i}`}
+                                                    style={{ width: 110, height: 140 }}
+                                                ></div>
+                                            ))}
+                                    </Image.PreviewGroup>
+                                )}
                             </div>
                         </div>
                     </div>

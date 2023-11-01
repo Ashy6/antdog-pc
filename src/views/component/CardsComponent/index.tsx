@@ -21,9 +21,7 @@ const CardsComponent = (props: {
     value: AnyObject
     isDetails?: boolean
 }) => {
-
     const { value, isDetails } = props
-
     const {
         detailList = [], // 详情
         advCode, //
@@ -44,17 +42,10 @@ const CardsComponent = (props: {
     } = value;
 
     const dispatch = useDispatch()
-    const userInfo = useSelector((store: { userInfo: AnyObject }) => store.userInfo.value)
     const selectValue = useSelector((store: { selectInfo: { value: SelectParamsType } }) => store.selectInfo.value)
 
     const [loading, setLoading] = useState(false);
-    const [img, setImg] = useState([
-        'https://gw.alipayobjects.com/zos/antfincdn/LlvErxo8H9/photo-1503185912284-5271ff81b9a8.webp',
-        'https://gw.alipayobjects.com/zos/antfincdn/cV16ZqzMjW/photo-1473091540282-9b846e7965e3.webp',
-        'https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp',
-        // 'https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp',
-        // 'https://gw.alipayobjects.com/zos/antfincdn/x43I27A55%26/photo-1438109491414-7198515b166b.webp'
-    ])
+    const [imageList, setImageList] = useState([]);
     const [opened, setOpen] = useState(false);
     const [rulingOpened, setRulingOpened] = useState(false);
     const [description, setDescription] = useState('');
@@ -67,16 +58,15 @@ const CardsComponent = (props: {
         setOrderStatus(status);
     }, [status]);
 
-    /**
-     * TODO: 1 渲染图片
-     * 这里假设 传入的 images 需要二次处理，用这个 effect 来监听，然后处理后 set 到 img 里
-     * 这里详情页和卡片都用到了当前组件，在详情页中图片的展示没能平铺下去，不用管。
-     */
     useEffect(() => {
-        if (images && images.length) {
-            setImg(images.split(','))
-        }
-    }, [images]);
+        // 包含多组图片的详情
+        const imgDetailList = detailList.map(it => ({
+            ...it,
+            imgArr: it.images.split(',') || []
+        }))
+        setImageList(imgDetailList)
+        // TODO: 如果更新卡片后图片渲染出问题可以考虑监听 [detailList]
+    }, [])
 
     const openDetails = () => {
         dispatch(updateSourceStore(value))
@@ -159,7 +149,6 @@ const CardsComponent = (props: {
 
     const negotiateRateChange = (value: number) => {
         setNegotiationRate(value);
-        console.log(value)
     };
 
     const rulingRateChange = (value: number) => {
@@ -300,35 +289,41 @@ const CardsComponent = (props: {
                 </div>
             </div>
 
-            <div className={detailClass}>
-                {/* images */}
-                <div className='card-item-images' >
-                    <Image.PreviewGroup>
-                        {/* TODO: 这里的样式渲染有问题，考虑每三个一组独立渲染
-                        每一组加 detail-content 类名保证不换行展示*/}
-                        {img.slice(0, isDetails ? img.length : 3).map((img, i) => (
-                            <Image key={i} width={100} height={120} src={img} />
-                        ))}
-                        {/* 不满足三个展示空占位 */}
-                        {img.length < 3 &&
-                            Array.from({ length: 3 - img.length }, (_, i) => (
-                                <div className='ant-image' key={`empty-${i}`} style={{ height: 120 }}></div>
-                            ))}
-                    </Image.PreviewGroup>
-                </div>
-                {/* 图片超过三个显示 */}
-                {img.length > 3 && !isDetails && (
-                    <div className='card-item-more'>······</div>
-                )}
-                {/* USD */}
-                <div className='card-item-USD' >
-                    <span>999999</span>
-                    <span>USD</span>
-                    <span>37793555427155729</span>
-                    <span>05/31</span>
-                    <span>6207</span>
-                </div>
-            </div>
+            {
+                imageList.map((info, index) => {
+                    const { imgArr } = info
+                    return (isDetails || index === 0) ? (<div className={detailClass}>
+                        {/* images */}
+                        <div className='card-item-images' >
+                            <Image.PreviewGroup>
+                                {/* TODO: 这里的样式渲染有问题，考虑每三个一组独立渲染
+                                每一组加 detail-content 类名保证不换行展示*/}
+                                {imgArr.map((url, i) => (
+                                    <Image key={i} width={100} height={120} src={url} />
+                                ))}
+                                {/* 不满足三个展示空占位 */}
+                                {imgArr.length < 3 &&
+                                    Array.from({ length: 3 - imgArr.length }, (_, i) => (
+                                        <div className='ant-image' key={`empty-${i}`} style={{ height: 120 }}></div>
+                                    ))}
+                            </Image.PreviewGroup>
+                        </div>
+                        {/* 图片超过三个显示 */}
+                        {imgArr.length > 3 && !isDetails && (
+                            <div className='card-item-more'>······</div>
+                        )}
+                        {/* USD */}
+                        <div className='card-item-USD' >
+                            <span>999999</span>
+                            <span>USD</span>
+                            <span>37793555427155729</span>
+                            <span>05/31</span>
+                            <span>6207</span>
+                        </div>
+                    </div>) : <></>
+                })
+            }
+
 
             {selectValue.isRuling ? (<div className='card-item-btn'>
                 <Button className='antdog-btn' type="primary" onClick={() => showRulingModal('seller')}>

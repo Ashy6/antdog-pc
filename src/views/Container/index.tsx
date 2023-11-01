@@ -41,28 +41,25 @@ const Container = () => {
         switch (selectValue.menuKey) {
             // 获取 Cards 数据
             case SidebarMenuType.Cards:
-                getOrderPage(params).then(res => {
-                    const { records, total } = res.data
-                    setPagination(value => ({
-                        ...value,
-                        total,
-                    }))
-                    setList(records as AnyObject[])
-                })
+                getOrderPage(params).then(callback)
                 break
             // 获取 Points 数据
             case SidebarMenuType.Points:
-                getPointsOrderPage(params).then(res => {
-                    const { records, total } = res.data
-                    setPagination(value => ({
-                        ...value,
-                        total,
-                    }))
-                    setList(records as AnyObject[])
-                })
+                getPointsOrderPage(params).then(callback)
                 break
         }
     }, [selectValue, pagination.page])
+
+    const callback = res => {
+        if (res) {
+            const { records, total } = res.data
+            setPagination(value => ({
+                ...value,
+                total,
+            }))
+            setList(records as AnyObject[])
+        }
+    }
 
     const onPageChange = (page: number) => {
         setPagination(value => ({
