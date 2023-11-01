@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { message } from 'antd'
+import { getSelectBalance } from '../../api/login'
 
 /**
  * 存储用（商）户信息的 store
@@ -25,9 +26,14 @@ const userStateSlice = createSlice({
       } else {
         message.warning({ content: 'Insufficient points balance.' })
       }
+    },
+    syncUserInfo: (state) => {
+      getSelectBalance().then((res) => {
+        state.value = res.data as any;
+      });
     }
   }
 })
 
-export const { updateUserStore, freezeUserPoints } = userStateSlice.actions
+export const { updateUserStore, freezeUserPoints, syncUserInfo } = userStateSlice.actions
 export default userStateSlice.reducer

@@ -25,7 +25,7 @@ export const getOrderDetails = (orderNo: string): Promise<string> => {
   return instance({
     url: `${VITE_CONFIG}/order/detail`,
     method: 'get',
-    params: {orderNo}
+    params: { orderNo }
   })
 }
 
@@ -36,8 +36,28 @@ export const releaseOrder = (orderNo: string): Promise<RequestDate> => {
   return instance({
     url: `${VITE_CONFIG}/order/release`,
     method: 'get',
-    params: {orderNo}
+    params: { orderNo }
   })
+}
+
+/**
+ * 仲裁订单
+ * 商户获胜 winner 为商户号 loser 为用户id
+ * 用户获胜 winner 为用户id loser 为商户号
+ */
+export const judgmentOrder = (data: {
+  orderNo: string,
+  winner: string,
+  loser: string,
+  images?: string,
+  description?: string,
+  points: number
+}): Promise<RequestDate> => {
+  return instance({
+    url: `${VITE_CONFIG}/order/judgment`,
+    method: 'post',
+    data: data
+  });
 }
 
 /**

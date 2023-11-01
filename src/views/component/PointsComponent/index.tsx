@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
-import { Button, Col, Modal, Row, Upload, UploadFile, Image, UploadProps } from 'antd';
+import { Button, Col, Modal, Row, Upload, UploadFile, Image, UploadProps, InputNumber } from 'antd';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import TextArea from 'antd/es/input/TextArea';
 
-import { cancelPointsOrder, paidPointsOrder } from '../../../api/points';
+import { cancelPointsOrder, judgmentPoints, paidPointsOrder } from '../../../api/points';
 import { updateSourceStore } from '../../../store/reducers/sourceState'
-import { freezeUserPoints } from '../../../store/reducers/userState';
+import { syncUserInfo } from '../../../store/reducers/userState';
 import { OrderStatus } from '../../../types/order-status';
 import { formatTime } from '../../../utils/time';
 import { SelectParamsType } from '../../../types/types';
@@ -25,7 +25,13 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
         detailList = [], // 详情
         status,
         amount,
-        points
+        seller,      // 售卖人
+        buyer,
+        point,
+        points,
+        rate,
+        userId,
+        merchNo
     } = value;
     const dispatch = useDispatch()
 
@@ -41,9 +47,17 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
     const [uploading, setUploading] = useState(false);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
 
+    const [rulingDescription, setRulingDescription] = useState('');
+    const [rulingPoint, setRulingPoint] = useState(points);
+
     useEffect(() => {
         setOrderStatus(status);
     }, [status]);
+
+    useEffect(() => {
+        setRulingPoint(points);
+    }, [points]);
+
 
     const cancelOrder = async () => {
         // TODO: 二次弹窗
@@ -62,14 +76,42 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
             images: '',
             memo: description
         });
-        setOrderStatus(OrderStatus.completed);
-        dispatch(freezeUserPoints(points));
+        setOrderStatus(OrderStatus.inTradeProcessing);
+        dispatch(syncUserInfo());
         setOpen(false);
         setLoading(false);
     };
 
     const handleCancel = (e: React.MouseEvent<HTMLElement>) => {
         setOpen(false);
+    };
+
+    const rulingPointChange = (value: number) => {
+        setRulingPoint(value);
+    }
+
+    const [winner, setWinner] = useState(null);
+
+    const rulingHandleOk = async (e: React.MouseEvent<HTMLElement>) => {
+        setLoading(true);
+
+        const response = await judgmentPoints({
+            orderNo: orderNo,
+            winner: winner === 'buyer' ? userId : merchNo,
+            loser: winner === 'buyer' ? merchNo : userId,
+            description: rulingDescription,
+            points: points,
+            images: fileList.map(x => x.response?.data).filter(x => Boolean(x)).join(),
+        });
+        if (response.code === 0) {
+            setOrderStatus(OrderStatus.inDisputeNegotiate);
+            setRulingOpened(false);
+            setLoading(false);
+        }
+    };
+
+    const rulingHandleCancel = (e: React.MouseEvent<HTMLElement>) => {
+        setRulingOpened(false);
     };
 
     const handleChange: UploadProps['onChange'] = ({ fileList: newFileList, file }) => {
@@ -138,6 +180,35 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
         },
     ]
 
+    const rulingModalData = [
+        { key: 1, postfix: 'odd', label: 'Order Number', value: [null, orderNo] },
+        { key: 2, postfix: 'even', label: 'Order Time', value: [null, formatTime(createTime)] },
+        { key: 3, postfix: 'odd', label: 'Seller', value: [null, seller] },
+        { key: 4, postfix: 'even', label: 'Buyer', value: [null, buyer] },
+        { key: 5, postfix: 'odd', label: 'Order Amount', span: 3, value: [amount, `USD`] },
+        { key: 6, postfix: 'even', label: 'Order Rate', span: 3, value: [rate, `Points`] },
+        { key: 7, postfix: 'odd', label: 'Negotiation Rate', span: 3, value: [rate, `Points`] },
+        { key: 8, postfix: 'even', label: 'Ruling', span: 3, value: [<InputNumber min={0} max={rulingPoint} value={rulingPoint} defaultValue={rulingPoint} onChange={rulingPointChange} />, 'Points'] },
+        {
+            key: 9,
+            postfix: 'odd',
+            isControl: true,
+            span: 3,
+            label: <>
+                <div className='desc-label'>Conclusion</div>
+            </>,
+            value: [
+                <TextArea
+                    bordered={false}
+                    value={rulingDescription}
+                    onChange={(e) => setRulingDescription(e.target.value)}
+                    placeholder="Please combine all the circumstances and enter the platform’s ruling conclusion."
+                    autoSize={{ minRows: 5, maxRows: 6 }}
+                />
+            ]
+        }
+    ];
+
     const componentClass = `card-item ${isDetails && 'detail-content'}`
     return (
         <div className={componentClass}>
@@ -181,7 +252,7 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
                         Points
                     </span>
                     <span>
-                        {points}
+                        {point}
                     </span>
                 </div>
                 <div className='card-item-points-info'>
@@ -246,6 +317,35 @@ const PointsComponent = (props: { value: AnyObject, isDetails?: boolean }) => {
                     })
                 }
             </Modal>}
+
+            <Modal
+                className='negotiate-dialog'
+                title="Ruling"
+                open={rulingOpened}
+                closeIcon={null}
+                destroyOnClose={true}
+                onOk={rulingHandleOk}
+                onCancel={rulingHandleCancel}
+                footer={[
+                    <Button className='antdog-btn' key="cancel" onClick={rulingHandleCancel}>
+                        Cancel
+                    </Button>,
+                    <Button key="submit" className='submit-btn' loading={loading} onClick={rulingHandleOk}>
+                        Confirm
+                    </Button>
+                ]}
+            >
+                {
+                    rulingModalData.map(item => {
+                        return <Row key={item.key} className={`ant-row-${item.postfix}`}>
+                            <Col span={10}>{item.label}</Col>
+                            {item.value.map((v) => {
+                                return <Col key={item.key + '-' + v} span={v === null ? 4 : item.isControl ? 14 : item.span === 3 ? 7 : 10}>{v}</Col>
+                            })}
+                        </Row>;
+                    })
+                }
+            </Modal>
 
             {/* btn */}
             {

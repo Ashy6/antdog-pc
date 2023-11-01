@@ -5,9 +5,9 @@ import { Button, Image, Modal, Row, Col, Upload, Input, InputNumber } from 'antd
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 import { updateSourceStore } from '../../../store/reducers/sourceState'
-import { freezeUserPoints } from '../../../store/reducers/userState'
+import { syncUserInfo } from '../../../store/reducers/userState'
 
-import { negotiate, releaseOrder } from '../../../api/cards'
+import { judgmentOrder, negotiate, releaseOrder } from '../../../api/cards'
 import { OrderStatus } from '../../../types/order-status'
 import { formatTime } from '../../../utils/time'
 import { SelectParamsType } from '../../../types/types';
@@ -34,10 +34,13 @@ const CardsComponent = (props: {
         //updateTime, // 更新时间
         images, // 图片，TODO：1. 如果命名不对按接口返回的字段为主
         seller,      // 售卖人
-        // rate,        // 汇率
+        rate,        // 汇率
         // cardType,
         buyer, // 买家
-        status
+        status,
+        merchNo, // 商户号
+        userId, // 用户
+        faceValue // 总面值
     } = value;
 
     const dispatch = useDispatch()
@@ -83,8 +86,9 @@ const CardsComponent = (props: {
         setOpen(true);
     };
 
-    const showRulingModal = () => {
+    const showRulingModal = (winner: 'seller' | 'buyer') => {
         setRulingOpened(true);
+        setWinner(winner);
     };
 
     const handleOk = async (e: React.MouseEvent<HTMLElement>) => {
@@ -105,39 +109,36 @@ const CardsComponent = (props: {
             "points": points
         });
         // 冻结积分数
-        // dispatch(freezeUserPoints(negotiationRate || detailList[0]?.rate))
-        setOrderStatus(OrderStatus.inDisputeNegotiate);
-        setOpen(false);
-        setLoading(false);
+        if (response.code === 0) {
+            setOrderStatus(OrderStatus.inDisputeNegotiate);
+            dispatch(syncUserInfo());
+            setOpen(false);
+            setLoading(false);
+        }
     };
 
     const handleCancel = (e: React.MouseEvent<HTMLElement>) => {
         setOpen(false);
     };
 
+    const [winner, setWinner] = useState(null);
     const rulingHandleOk = async (e: React.MouseEvent<HTMLElement>) => {
         setLoading(true);
-        // const response = await negotiate({
-        //     "orderNo": orderNo,
-        //     receiver: seller,
-        //     "details": [
-        //         {
-        //             "id": orderId,
-        //             "orderNo": orderNo,
-        //             "finalFaceValue": negotiationRate || detailList[0]?.rate,
-        //             "memo": ""
-        //         }
-        //     ],
-        //     "images": fileList.map(x => x.response?.data).filter(x => Boolean(x)).join(),
-        //     "description": description
-        // });
+        const response = await judgmentOrder({
+            orderNo: orderNo,
+            winner: winner === 'buyer' ? userId : merchNo,
+            loser: winner === 'buyer' ? merchNo : userId,
+            points: points,
+            images: fileList.map(x => x.response?.data).filter(x => Boolean(x)).join(),
+            description: rulingDescription
+        });
         // // 冻结积分数
-        // dispatch(freezeUserPoints(negotiationRate || detailList[0]?.rate))
-
-        // console.log("提交协商返回结果：", response);
-        setOrderStatus(OrderStatus.inDisputeNegotiate);
-        setRulingOpened(false);
-        setLoading(false);
+        if (response.code === 0) {
+            dispatch(syncUserInfo());
+            setOrderStatus(OrderStatus.inDisputeNegotiate);
+            setRulingOpened(false);
+            setLoading(false);
+        }
     };
 
     const rulingHandleCancel = (e: React.MouseEvent<HTMLElement>) => {
@@ -167,8 +168,10 @@ const CardsComponent = (props: {
 
     const submitReleaseOrder = async () => {
         const response = await releaseOrder(orderNo);
-        console.log(response);
-        setOrderStatus(OrderStatus.completed);
+        if (response.code === 0) {
+            setOrderStatus(OrderStatus.completed);
+            dispatch(syncUserInfo());
+        }
     }
 
     const modalDescriptions = [
@@ -238,10 +241,11 @@ const CardsComponent = (props: {
         { key: 3, postfix: 'odd', label: 'Seller', value: [null, seller] },
         { key: 4, postfix: 'even', label: 'Buyer', value: [null, buyer] },
         { key: 5, postfix: 'odd', label: 'Order Amount', span: 3, value: [amount, `USD`] },
-        { key: 6, postfix: 'even', label: 'Ruling', span: 3, value: [<InputNumber min={0} max={detailList[0]?.rate} value={rulingRate} defaultValue={detailList[0]?.rate} onChange={rulingRateChange} />, 'Points'] },
+        { key: 6, postfix: 'even', label: 'Order Rate', span: 3, value: [rate, `Points`] },
+        { key: 7, postfix: 'odd', label: 'Ruling', span: 3, value: [<InputNumber min={0} max={detailList[0]?.rate} value={rulingRate} defaultValue={detailList[0]?.rate} onChange={rulingRateChange} />, 'Points'] },
         {
-            key: 7,
-            postfix: 'odd',
+            key: 8,
+            postfix: 'even',
             isControl: true,
             span: 3,
             label: <>
@@ -327,10 +331,10 @@ const CardsComponent = (props: {
             </div>
 
             {selectValue.isRuling ? (<div className='card-item-btn'>
-                <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
+                <Button className='antdog-btn' type="primary" onClick={() => showRulingModal('seller')}>
                     Seller Win
                 </Button>
-                <Button className='antdog-btn' type="primary" onClick={showRulingModal}>
+                <Button className='antdog-btn' type="primary" onClick={() => showRulingModal('buyer')}>
                     Buyer Win
                 </Button>
             </div>) : (<>
@@ -373,13 +377,12 @@ const CardsComponent = (props: {
                 open={rulingOpened}
                 closeIcon={null}
                 destroyOnClose={true}
-                onOk={rulingHandleOk}
                 onCancel={rulingHandleCancel}
                 footer={[
                     <Button className='antdog-btn' key="cancel" onClick={rulingHandleCancel}>
                         Cancel
                     </Button>,
-                    <Button key="submit" className='submit-btn' loading={loading} onClick={rulingHandleOk}>
+                    <Button key="submit" className='submit-btn' loading={loading} onClick={e => rulingHandleOk(e)}>
                         Confirm
                     </Button>
                 ]}
